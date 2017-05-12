@@ -1,0 +1,22 @@
+{
+  "name": "totem",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zaimwa9/Totem.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Zaimwa9/Totem/issues"
+  },
+  "homepage": "https://github.com/Zaimwa9/Totem#readme",
+  "dependencies": {
+    "mongoose": "^4.9.8"
+  }
+}
