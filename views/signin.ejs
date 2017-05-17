@@ -1,0 +1,22 @@
+<!-- How I see it:
+This will be the signin form. First filled manually but then this is supposed to be replaced with a facebook authentification system
+NB: from the form, it's the name that's gonna be parsed. "id" is used in the DOM
+-->
+
+<html>
+    <head>
+        <title> Signin Totem </title>
+    </head>
+
+    <body>
+        <h3> Welcome, would be nice to signin and get access to our nice festival ! </h3>
+
+        <form method="POST" action="/newuser">
+            username: <input type="text" id="username" name="username" /><br /> 
+            email: &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="text" id="email"name="email" /><br />
+            password: &nbsp<input type="text" id="password"name="password" /><br />
+            <input type="submit" value="submit" />
+        </form>
+    </body>
+
+</html>
