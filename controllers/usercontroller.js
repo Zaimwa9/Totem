@@ -6,16 +6,28 @@ var bodyParser=require('body-parser');
 
 var urlencodedParser=bodyParser.urlencoded({extended:false}); // this part is used being passed as a callback in the post statements
 var jsonParser=bodyParser.json(); // Same but parses Json objects
-var usercontroller=require('../controllers/usercontroller.js');
 
 
 module.exports=function(app){
     app.post('/newuser', urlencodedParser, function(req,res){
-        global.Users.register(req.body, function(err,user){
-            if (err) return res.send('error + Mongoose');
-            res.send(user + ' saved');
-        });
-       
+        
+        req.checkBody('email',"Enter valid email").isEmail();      // working for email
+        req.checkBody('password',"Password must be at least 6 characters").notEmpty().len(6,30);    // working for passwords
+        req.checkBody('username','Woops you forgot your username').notEmpty();
+
+        var error=req.validationErrors();            
+           
+        if (error) {
+            console.log(error);
+            res.send(error); return
+        }
+        else
+        {   
+            global.Users.register(req.body, function(err, user){
+                if (err) return res.send('error + Mongoose');
+                res.send(user +' saved');
+            });
+        };
         
         /* Will include a typo check to verify that email is an email etc ...
         /* This means:

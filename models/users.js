@@ -1,22 +1,60 @@
 /* In here we will add all the functions as methods to the User model and they will be called in the UserController */
 
 var mongoose=require('mongoose');
+var bcrypt=require('bcrypt');
+var SALT_WORK_FACTOR=10;
 
 var Schema=mongoose.Schema;
 
 var UserSchema = new Schema({
-    username: String,
+    username: { type: String, required: true, index: { unique: true } },
     email: String,
-    password: String
+    password: { type: String, required: true }
 });
 
+//encrypting the password using a middleware
+
+UserSchema.pre('save', function (next) {
+      var User=this;
+      // only hash the password if it has been modified (or is new)
+      // Boolean to check if any modification
+      console.log(User.isModified('password') + 'password checking');
+      if (!User.isModified('password')) return next();
+
+      //generate a salt using bcrypt
+      bcrypt.genSalt(SALT_WORK_FACTOR, function (err,salt){
+          if (err) return next(err);
+          console.log('hashing');
+          // hash the password with the new salt
+          bcrypt.hash(User.password, salt, function(err,hash){
+              if (err) return next(err);
+
+              //override the cleartext password with the hashed one
+              User.password=hash;
+              next();
+          });
+        });
+});
+
+
+// password check
+
+UserSchema.methods.comparePassword = function(candidatePassword, cb) {
+    bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
+        if (err) return cb(err);
+        cb(null, isMatch);
+    });
+};
+
+;
+// Create new user phase
 UserSchema.statics.register= function(data, cb){
      
-     var newuser={
+     var newuser= new Users ({
        username: data.username,
        email: data.email,
        password: data.password
-     };
+     });
      console.log('username is ' + data.username);
 
      if ( !(newuser.password) || newuser.password < 5)
@@ -30,10 +68,10 @@ UserSchema.statics.register= function(data, cb){
               if (user.email===newuser.email)   return cb(new Error('Email already exists, please select a new one'))
               };
          
-         Users.create(newuser, function(err, user){
-              if (err) return cb(err);
+     Users.create(newuser, function(err, user){
+        if (err) return cb(err);
 
-              return cb(null, user);
+        return cb(null, user);
 
          });
     });
