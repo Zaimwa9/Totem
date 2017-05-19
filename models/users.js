@@ -36,18 +36,7 @@ UserSchema.pre('save', function (next) {
         });
 });
 
-
-// password check
-
-UserSchema.methods.comparePassword = function(candidatePassword, cb) {
-    bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
-        if (err) return cb(err);
-        cb(null, isMatch);
-    });
-};
-
-;
-// Create new user phase
+// Create a new user
 UserSchema.statics.register= function(data, cb){
      
      var newuser= new Users ({
@@ -76,11 +65,52 @@ UserSchema.statics.register= function(data, cb){
          });
     });
 };
+
+// password check
+
+UserSchema.method.comparePassword = function(candidatePassword, obj, cb) {
+    bcrypt.compare(candidatePassword, obj.password, function(err, isMatch) {
+        if (err) return cb(err);
+        cb(null, isMatch);
+    });
+};
+
+/*
+comparePassword2 = function(candidatePassword, cb) {
+    bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
+        if (err) return err;
+        cb(null, isMatch);
+    });
+};
+
+
+UserSchema.statics.login = function (data, cb){
+    Users.findOne({username: data.username}, function (err, user){
+        console.log(data.username + data.password);
+        if (err) return cb(err);
+        if (user)
+        { 
+            if (comparePassword2(data.password, user.password, function(err,isMatch){
+                console.log(data.password + ' checking');
+                if (err) throw err;
+            }) == 'true')
+            {
+              return cb(null, user);
+            };
+        };
+
+    });
+};
+*/
+
 var Users=mongoose.model('Users', UserSchema);
 
 global.Users=Users;
 
 module.exports=Users;
+
+
+
 
 
 /*

@@ -5,6 +5,7 @@ var Users=require('./models/users.js');
 var mongoose=require('mongoose');
 var bodyParser=require('body-parser');
 var expressValidator=require('express-validator');
+const session = require('express-session');
 
 // require controllers
 var usercontroller=require('./controllers/usercontroller.js');
@@ -12,27 +13,28 @@ var setupcontroller=require('./controllers/setupcontroller.js')
 
 var port=process.env.PORT || 3000;
 
-app.use('/assets', express.static(__dirname+'/public')); //this exposes the public folder to serve static files
-app.use(bodyParser({extended: true}));
-app.use(expressValidator());
-
-app.set('view engine', 'ejs');
-
 mongoose.connect(config.getDbConnectionstring(),function(){
         console.log('Successfuly connected')
         });
 
-//Serves the landing page
-app.get('/', (req,res) => { 
-        res.render('index.ejs');
-});
-//Serves the signin page (could be included as client-side Javascript no ?)
+app.use(session({
+        key: 'session',
+        secret: 'helloworld123',
+        store: require('mongoose-session')(mongoose)
+}));
 
-app.get('/signin', (req,res) => {
-        res.render('signin.ejs')
-});
+var sess;
+
+app.use('/assets', express.static(__dirname+'/public')); //this exposes the public folder to serve static files
+
+app.use(bodyParser({extended: true}));
+
+app.use(expressValidator());
+
+app.set('view engine', 'ejs');
 
 usercontroller(app);
+
 setupcontroller(app);
 
 app.listen(port);

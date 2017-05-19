@@ -1,0 +1,6 @@
+To compare passwords for authentification:
+
+    user.comparePassword(auth_attempt.password, function(err, isMatch) {
+        if (err) throw err;
+        console.log(auth_attempt.password, isMatch); will return true if match, else false;
+    });

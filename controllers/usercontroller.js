@@ -9,6 +9,18 @@ var jsonParser=bodyParser.json(); // Same but parses Json objects
 
 
 module.exports=function(app){
+    
+    //Serves the landing page
+    app.get('/', (req,res) => { 
+            res.render('index.ejs');
+    });
+
+    //Serves the signin page (could be included as client-side Javascript no ?)
+    app.get('/signin', (req,res) => {
+            res.render('signin.ejs')
+    });
+
+    //This part handles the signin and user creation
     app.post('/newuser', urlencodedParser, function(req,res){
         
         req.checkBody('email',"Enter valid email").isEmail();      // working for email
@@ -28,16 +40,55 @@ module.exports=function(app){
                 res.send(user +' saved');
             });
         };
-        
-        /* Will include a typo check to verify that email is an email etc ...
-        /* This means:
-1) parse the json object sent from the form
-2) save it to the database (and encrypt the password if possible)
-3) say thanks and redirect the guy to the main logged in page
-*/
-        /*res.send('Thank you!');
-        console.log(req.body.username);
-        console.log(req.body.email);
-        console.log(req.body.password);*/
+    }); //end of the signup post
+
+    // Serves the loginpage
+    app.get('/login', (req,res) => {
+        sess=req.session;
+        if (sess.username){    
+            return res.send('woops already loggedin' + sess.username)
+        }
+        return res.render('login.ejs')
     });
-}
+
+    app.post('/loginform', urlencodedParser, function(req,res){
+        sess=req.session;
+        req.checkBody('username','Woops you forgot your username').notEmpty();
+        req.checkBody('password','Woops you forgot your password').notEmpty();
+
+        var error=req.validationErrors();
+
+        if (error){
+            console.log(error);
+            res.send(error); return
+        }
+        else
+        {   
+            Users.findOne({username: req.body.username}, function(err, user){
+                if (err) throw err;
+                if (!user) {return res.send('No user like this known')};
+                
+                Users.comparePassword(req.body.password, user, function(err, isMatch){
+                    if (err) throw err;
+                    console.log(isMatch);
+                    if (isMatch) {
+                        sess.username = user.username ;
+                        return res.send('Logged in');
+                    }
+                    else
+                    {
+                        return res.send('sorry, wrong password: '+ req.body.password);
+                    }
+                });
+            }) //end of findOne
+        };
+    }); // end of the post
+
+
+app.get('/session', function(req,res){
+    console.log(sess);
+    if (sess.username) {return res.send(sess.username + " hello")};
+})
+
+
+} //end of the module export
