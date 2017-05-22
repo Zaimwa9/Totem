@@ -9,7 +9,8 @@ const session = require('express-session');
 
 // require controllers
 var usercontroller=require('./controllers/usercontroller.js');
-var setupcontroller=require('./controllers/setupcontroller.js')
+var setupcontroller=require('./controllers/setupcontroller.js');
+var projectcontroller=require('./controllers/projectcontroller.js');
 
 var port=process.env.PORT || 3000;
 
@@ -33,8 +34,10 @@ app.use(expressValidator());
 
 app.set('view engine', 'ejs');
 
-usercontroller(app);
+// Calling all the controllers
 
+usercontroller(app);
 setupcontroller(app);
+projectcontroller(app);
 
 app.listen(port);

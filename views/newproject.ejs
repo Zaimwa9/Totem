@@ -1,0 +1,22 @@
+<!-- How I see it:
+This will be the signin form. First filled manually but then this is supposed to be replaced with a facebook authentification system
+NB: from the form, it's the name that's gonna be parsed. "id" is used in the DOM
+-->
+
+<html>
+    <head>
+        <title> Create your project </title>
+    </head>
+
+    <body>
+        <h3> Welcome, would be nice to add your own project to Totem ! </h3>
+
+        <form method="POST" action="/newproject">
+            name: <input type="text" id="name" name="name" /><br /> 
+            category: <input type="text" id="category" name="category" /><br />
+            description: <input type="text" id="description" name="description" /><br />
+            <input type="submit" value="submit" />
+        </form>
+    </body>
+
+</html>

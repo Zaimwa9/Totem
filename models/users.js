@@ -9,7 +9,10 @@ var Schema=mongoose.Schema;
 var UserSchema = new Schema({
     username: { type: String, required: true, index: { unique: true } },
     email: String,
-    password: { type: String, required: true }
+    password: { type: String, required: true },
+    role: String,
+    projects_array: Array,
+    created_at: Date
 });
 
 //encrypting the password using a middleware
@@ -42,12 +45,12 @@ UserSchema.statics.register= function(data, cb){
      var newuser= new Users ({
        username: data.username,
        email: data.email,
-       password: data.password
+       password: data.password,
+       role: 'user',
+       projects_array: [],
+       created_at: new Date().getTime()
      });
      console.log('username is ' + data.username);
-
-     if ( !(newuser.password) || newuser.password < 5)
-        return cb(new Error('Invalid password, please choose one with at least 6 characters'));
     
      Users.findOne( {$or: [{ email: newuser.email }, { username: newuser.username }]}, function(err,user){
         if (err) return cb(err);
