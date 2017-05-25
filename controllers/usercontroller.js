@@ -5,7 +5,8 @@ var Users= require('../models/users');
 var bodyParser = require('body-parser');
 var passport = require('passport');
 var FacebookStrategy = require('passport-facebook').Strategy;
-var fbconfig = require('../Oauth/fbconfig')
+var fbconfig = require('../Oauth/fbconfig');
+var Projects = require('../models/projects');
 
 var urlencodedParser=bodyParser.urlencoded({extended:false}); // this part is used being passed as a callback in the post statements
 var jsonParser=bodyParser.json(); // Same but parses Json objects
@@ -32,13 +33,17 @@ function ensureAuthenticated(req, res, next) {
 module.exports=function(app){
     
     //Serves the landing page
-    app.get('/', (req,res) => { 
-            res.render('index.ejs', {auth: req.isAuthenticated()});
+    app.get('/', (req,res) => {
+        Projects.find({edition : 'Totem V'}, ['name', 'leader', 'members_count', 'created_at'], { sort: {created_at: -1}}, function (err, results, count){
+        if (err) return err;
+        console.log(results.length);
+            res.render('index.ejs', {auth: req.isAuthenticated(), projects: results, count: results.length});
+        });
     });
 
     //Serves the signin page (could be included as client-side Javascript no ?)
     app.get('/signin', (req,res) => {
-            res.render('signin.ejs')
+        res.render('signin.ejs')
     });
 
     //This part handles the signin and user creation

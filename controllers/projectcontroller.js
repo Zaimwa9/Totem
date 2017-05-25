@@ -37,12 +37,19 @@ module.exports=function(app){
     });
 
     app.get('/projectlist', (req,res) => {
-        Projects.find({edition : 'Totem V'}, ['name', 'leader', 'members_count', 'img'], { sort: {date_added: -1}}, function (err, results){
+        Projects.find({edition : 'Totem V'}, ['name', 'leader', 'members_count', 'created_at'], { sort: {created_at: -1}}, function (err, results, count){
             if (err) return err;
-            res.send(results)
+            console.log(results.length);
+            res.render('allprojects.ejs', {projects: results, count: results.length} )
         });
     });
 
+    app.get('/projects/:projectname', (req,res) => {
+        Projects.find({name: req.params.projectname}, function (err, project){
+            if (err) return err;
+            res.send(project);
+        })
+    })
 
 
 // update a new project

@@ -1,0 +1,12 @@
+<!-- How I see it:
+This is gonna be a page with public info ? Displaying some stands, navigating to information pages etc
+Sort of vitrine website and will let you signup and login etc ...
+ -->
+
+<html>
+    <h1> Check all the projects that we have </h1>
+    <body> 
+        <% for(i=0; i<count; i++) {%>
+        <a href='/projects/<%= projects[i].name %>'> <button type="submit"><%= projects[i].name %> <% } %></button> 
+    </body>
+</html>

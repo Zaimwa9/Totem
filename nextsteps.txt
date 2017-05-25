@@ -3,4 +3,5 @@
 
 
 1) Page displaying all the projects
+
 2) Single project page (with chat ? Likes button etc)

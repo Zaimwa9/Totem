@@ -6,10 +6,24 @@ Sort of vitrine website and will let you signup and login etc ...
 <html>
     <h1> Hello, this is totem homepage </h1>
     <body>
+
+        <a href="/projectlist"> <button type="button"> See all projects </button> </a>
+        </br>
         <% if (!auth) { %>
-        <a href="/auth/facebook"> <button type="button" href="/auth/facebook"> signin </button> </a> <%} %>
+        <a href="/auth/facebook"> <button type="button"> login </button> </a> <%} %>
         
         <% if (auth) { %>
-        <a href="/logout"> <button type="button" href="/auth/facebook"> logout </button> </a> <%} %>
+        <a href="/newprojectpage"> <button type="button"> Create your own project </button> </a> <%} %>
+        </br>
+        <% if (auth) { %>
+        <a href="/logout"> <button type="button"> logout </button> </a> <%} %>
+        
+        </br>
+            <h1> Check all the projects that we have </h1>
+    <body> 
+        <% for(i=0; i<count; i++)  {%> 
+        <a href='/projects/<%= projects[i].name %>'> </br> <button type="submit"><%= projects[i].name %>  <% } %> </button> 
+    </body>
+
     </body>
 </html>
