@@ -27,7 +27,7 @@ ProjectSchema.statics.adding = function(project, user, cb){
         name: project.name,
         leader: user.username,
         members_count: 1,
-        members_array: 'test',
+        members_array: members_array.push(user.username),
         description: project.description,
         img: '',
         category: project.category,

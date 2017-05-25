@@ -1,7 +1,17 @@
 25/05/2017:
 **** Asks Valentin how to create a filter 
 
+0) img upload
 
-1) Page displaying all the projects
+1) Project actions:
+    a) update & delete (single project page + owner)
+    b) post a message (single project page)
+    c) upvote a project (all & single project pages)
+    d) join a project (all & single project pages)
+    e) being curious about a project (on the long-run = receiving the notifications)
 
-2) Single project page (with chat ? Likes button etc)
+2) Filters on projects + search bar (Javascript client-side ?)
+
+3) Your own projects (Javascript client-side ?)
+
+4) Notification system ?

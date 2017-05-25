@@ -14,7 +14,8 @@ var jsonParser=bodyParser.json(); // Same but parses Json objects
 passport.use(new FacebookStrategy({
     clientID: fbconfig.clientID,
     clientSecret: fbconfig.clientSecret,
-    callbackURL: "http://localhost:3000/auth/facebook/callback"
+    callbackURL: "http://localhost:3000/auth/facebook/callback",
+    profileFields: ['id', 'displayName', 'name', 'gender', 'picture']
   },
   function(accessToken, refreshToken, profile, cb) {
     Users.findOrCreatefb(profile, function (err, user) {

@@ -10,6 +10,7 @@ var UserSchema = new Schema({
     username: { type: String, required: true, index: { unique: true } },
     email: String,
     facebookId: String,
+    picture: String,
     password: String,
     role: String,
     projects_array: Array,
@@ -90,6 +91,7 @@ UserSchema.statics.findOrCreatefb = function(profile, cb){
             username: profile.displayName,
             facebookId: profile.id,
             role: 'user',
+            picture: profile.picture.url,
             created_at: new Date().getTime()
         });
 
