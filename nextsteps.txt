@@ -1,0 +1,6 @@
+25/05/2017:
+**** Asks Valentin how to create a filter 
+
+
+1) Page displaying all the projects
+2) Single project page (with chat ? Likes button etc)

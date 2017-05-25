@@ -9,14 +9,14 @@ var Schema=mongoose.Schema;
 var UserSchema = new Schema({
     username: { type: String, required: true, index: { unique: true } },
     email: String,
-    password: { type: String, required: true },
+    facebookId: String,
+    password: String,
     role: String,
     projects_array: Array,
     created_at: Date
 });
 
 //encrypting the password using a middleware
-
 UserSchema.pre('save', function (next) {
       var User=this;
       // only hash the password if it has been modified (or is new)
@@ -71,29 +71,42 @@ UserSchema.statics.register= function(data, cb){
 
 // password check
 
-UserSchema.method.comparePassword = function(candidatePassword, obj, cb) {
+UserSchema.statics.comparePassword = function(candidatePassword, obj, cb) {
     bcrypt.compare(candidatePassword, obj.password, function(err, isMatch) {
         if (err) return cb(err);
         cb(null, isMatch);
     });
 };
 
-/*
-comparePassword2 = function(candidatePassword, cb) {
-    bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
-        if (err) return err;
-        cb(null, isMatch);
+UserSchema.statics.findOrCreatefb = function(profile, cb){
+    console.log(profile.id); console.log(profile);
+
+    Users.findOne({facebookId: profile.id}, function (err, user){
+        if (err) return cb(err);
+
+        if (user) {console.log(user), console.log(user.id + ' vs ' + profile.id) ;console.log('user exists'); return cb(null,user)};
+
+        user= new Users ({
+            username: profile.displayName,
+            facebookId: profile.id,
+            role: 'user',
+            created_at: new Date().getTime()
+        });
+
+        user.save(function (err){
+            if (err) return err;
+            console.log(user + ' saved')
+        });
     });
-};
-
-
+}
+/*
 UserSchema.statics.login = function (data, cb){
     Users.findOne({username: data.username}, function (err, user){
         console.log(data.username + data.password);
         if (err) return cb(err);
         if (user)
         { 
-            if (comparePassword2(data.password, user.password, function(err,isMatch){
+            if (comparePassword(data.password, user.password, function(err,isMatch){
                 console.log(data.password + ' checking');
                 if (err) throw err;
             }) == 'true')

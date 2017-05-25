@@ -6,6 +6,7 @@ var mongoose=require('mongoose');
 var bodyParser=require('body-parser');
 var expressValidator=require('express-validator');
 const session = require('express-session');
+var passport = require('passport');
 
 // require controllers
 var usercontroller=require('./controllers/usercontroller.js');
@@ -13,6 +14,15 @@ var setupcontroller=require('./controllers/setupcontroller.js');
 var projectcontroller=require('./controllers/projectcontroller.js');
 
 var port=process.env.PORT || 3000;
+
+
+passport.serializeUser(function(user, cb) {
+  cb(null, user);
+});
+
+passport.deserializeUser(function(obj, cb) {
+  cb(null, obj);
+});
 
 mongoose.connect(config.getDbConnectionstring(),function(){
         console.log('Successfuly connected')
@@ -23,6 +33,8 @@ app.use(session({
         secret: 'helloworld123',
         store: require('mongoose-session')(mongoose)
 }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 var sess;
 
@@ -34,6 +46,7 @@ app.use(expressValidator());
 
 app.set('view engine', 'ejs');
 
+
 // Calling all the controllers
 
 usercontroller(app);
@@ -41,3 +54,4 @@ setupcontroller(app);
 projectcontroller(app);
 
 app.listen(port);
+

@@ -4,3 +4,53 @@ To compare passwords for authentification:
         if (err) throw err;
         console.log(auth_attempt.password, isMatch); will return true if match, else false;
     });
+
+1) 
+$$ Redirection et URLs customs: A OPTIMISER
+
+    app.get('/profile', (req,res) => {
+        var sess=req.session;
+        res.redirect('/' + sess.username);
+    });
+
+    app.get('/:username', (req,res) => {
+        var username=req.params.username;
+        res.send(username);
+    });
+
+
+2) 
+$$ Utilisation du comparePassword dans le controller et ne fonctionne pas dans le model
+
+(Model)
+    UserSchema.statics.comparePassword = function(candidatePassword, obj, cb) {
+        bcrypt.compare(candidatePassword, obj.password, function(err, isMatch) {
+            if (err) return cb(err);
+            cb(null, isMatch);
+        });
+    };
+
+(Controller)
+
+    Users.findOne({username: req.body.username}, function(err, user){
+                    console.log(Users);
+                    if (err) return err;
+
+                    if (!user) {return res.send('No user like this known')};
+                    
+                    Users.comparePassword(req.body.password, user, function(err, isMatch){
+                        if (err) return err;
+
+                        console.log(isMatch);
+                        
+                        if (isMatch) 
+                        {
+                            sess.username = user.username ;
+                        
+                            return res.send('Logged in');
+                        }
+                        else
+                        {
+                            return res.send('sorry, wrong password: '+ req.body.password);
+                        }
+                    });

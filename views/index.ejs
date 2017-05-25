@@ -5,4 +5,11 @@ Sort of vitrine website and will let you signup and login etc ...
 
 <html>
     <h1> Hello, this is totem homepage </h1>
+    <body>
+        <% if (!auth) { %>
+        <a href="/auth/facebook"> <button type="button" href="/auth/facebook"> signin </button> </a> <%} %>
+        
+        <% if (auth) { %>
+        <a href="/logout"> <button type="button" href="/auth/facebook"> logout </button> </a> <%} %>
+    </body>
 </html>

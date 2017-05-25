@@ -18,12 +18,17 @@
   "homepage": "https://github.com/Zaimwa9/Totem#readme",
   "dependencies": {
     "bcrypt": "^1.0.2",
+    "busboy": "^0.2.14",
+    "connect-busboy": "0.0.2",
     "ejs": "^2.5.6",
     "express": "^4.15.2",
+    "express-fileupload": "^0.1.3",
     "express-session": "^1.15.3",
     "express-validator": "^3.2.0",
     "mongoose": "^4.9.8",
     "mongoose-field-encryption": "^1.0.0",
-    "mongoose-session": "0.0.4"
+    "mongoose-session": "0.0.4",
+    "passport": "^0.3.2",
+    "passport-facebook": "^2.1.1"
   }
 }

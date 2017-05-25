@@ -13,6 +13,7 @@ var ProjectSchema = new Schema({
     description: String,
     category: String,
     img: String,
+    edition: String,
     created_at: Date
 });
 
@@ -21,15 +22,16 @@ var ProjectSchema = new Schema({
 ProjectSchema.statics.adding = function(project, user, cb){
     console.log(project);
     console.log(user);
-
+    
     var new_project = new Projects ({
         name: project.name,
-        leader: 'wadii',
+        leader: user.username,
         members_count: 1,
         members_array: 'test',
         description: project.description,
+        img: '',
         category: project.category,
-        img: 'url',
+        edition: 'Totem V',
         created_at: new Date().getTime()
     });
 
@@ -43,7 +45,7 @@ ProjectSchema.statics.adding = function(project, user, cb){
                 }
             };    
     });
-
+    
     Projects.create(new_project, function(err, proj){
         if (err) return cb(err);
         
