@@ -49,7 +49,7 @@ UserSchema.statics.register= function(data, cb){
        password: data.password,
        role: 'user',
        projects_array: [],
-       created_at: new Date().getTime()
+       created_at: new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '')
      });
      console.log('username is ' + data.username);
     
@@ -80,18 +80,19 @@ UserSchema.statics.comparePassword = function(candidatePassword, obj, cb) {
 };
 
 UserSchema.statics.findOrCreatefb = function(profile, cb){
-    console.log(profile.id); console.log(profile);
+    //console.log(profile);
+    console.log(profile.photos[0].value);
 
     Users.findOne({facebookId: profile.id}, function (err, user){
         if (err) return cb(err);
 
-        if (user) {console.log(user), console.log(user.id + ' vs ' + profile.id) ;console.log('user exists'); return cb(null,user)};
+        if (user) {console.log('user found'); return cb(null,user)};
 
         user= new Users ({
             username: profile.displayName,
             facebookId: profile.id,
             role: 'user',
-            picture: profile.picture.url,
+            picture: profile.photos[0].value,
             created_at: new Date().getTime()
         });
 

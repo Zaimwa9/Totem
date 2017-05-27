@@ -27,12 +27,12 @@ ProjectSchema.statics.adding = function(project, user, cb){
         name: project.name,
         leader: user.username,
         members_count: 1,
-        members_array: members_array.push(user.username),
+        members_array: [user.username],
         description: project.description,
         img: '',
         category: project.category,
         edition: 'Totem V',
-        created_at: new Date().getTime()
+        created_at: new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '')
     });
 
     Projects.findOne({name:new_project.name}, function(err, db_project){

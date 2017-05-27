@@ -36,8 +36,6 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-var sess;
-
 app.use('/assets', express.static(__dirname+'/public')); //this exposes the public folder to serve static files
 
 app.use(bodyParser({extended: true}));

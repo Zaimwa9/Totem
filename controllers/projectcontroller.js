@@ -7,7 +7,8 @@ var urlencodedParser = bodyParser.urlencoded({extended:false}); // this part is 
 var jsonParser = bodyParser.json(); // Same but parses Json objects
 var fs = require('fs')
 var busboy = require('connect-busboy');
-
+var Users = require ('../models/users');
+var moment = require('moment');
 
 function ensureAuthenticated(req, res, next) {
         if (req.isAuthenticated()) { console.log('authenticated'); return next(); }
@@ -32,7 +33,10 @@ module.exports=function(app){
 
         global.Projects.adding(current_proj, req.session.passport.user , function(err, proj){
             if (err) return res.send(err);
-            res.send(proj + ' saved');
+            Users.findOneAndUpdate({username: req.session.passport.user.username}, {$push: {projects_array : current_proj.name}}, function (err, user){
+            if (err) return err
+            res.send(proj + ' saved and user modified'+ user)
+            });
         });
     });
 
@@ -45,9 +49,10 @@ module.exports=function(app){
     });
 
     app.get('/projects/:projectname', (req,res) => {
-        Projects.find({name: req.params.projectname}, function (err, project){
+        Projects.findOne({name: req.params.projectname}, function (err, project){
             if (err) return err;
-            res.send(project);
+            //res.send(project)
+            res.render('singleprojectpage', {project: project, count_members: project.members_count, moment: moment});
         })
     })
 

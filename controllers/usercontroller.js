@@ -7,6 +7,7 @@ var passport = require('passport');
 var FacebookStrategy = require('passport-facebook').Strategy;
 var fbconfig = require('../Oauth/fbconfig');
 var Projects = require('../models/projects');
+var moment = require('moment');
 
 var urlencodedParser=bodyParser.urlencoded({extended:false}); // this part is used being passed as a callback in the post statements
 var jsonParser=bodyParser.json(); // Same but parses Json objects
@@ -15,7 +16,7 @@ passport.use(new FacebookStrategy({
     clientID: fbconfig.clientID,
     clientSecret: fbconfig.clientSecret,
     callbackURL: "http://localhost:3000/auth/facebook/callback",
-    profileFields: ['id', 'displayName', 'name', 'gender', 'picture']
+    profileFields: ['id', 'displayName', 'name', 'gender', 'picture.type(large)']
   },
   function(accessToken, refreshToken, profile, cb) {
     Users.findOrCreatefb(profile, function (err, user) {
@@ -37,8 +38,16 @@ module.exports=function(app){
     app.get('/', (req,res) => {
         Projects.find({edition : 'Totem V'}, ['name', 'leader', 'members_count', 'created_at'], { sort: {created_at: -1}}, function (err, results, count){
         if (err) return err;
-        console.log(results.length);
-            res.render('index.ejs', {auth: req.isAuthenticated(), projects: results, count: results.length});
+        if (req.isAuthenticated())
+            {
+                console.log(req.session.passport.user.username);
+                return res.render('index.ejs', {auth: req.isAuthenticated(), projects: results, count: results.length, username: req.session.passport.user.username});
+            }
+        if (!req.isAuthenticated())
+            {
+                console.log('no user logged so far');
+                return res.render('index.ejs', {auth: req.isAuthenticated(), projects: results, count: results.length});
+            }
         });
     });
 
@@ -73,7 +82,7 @@ module.exports=function(app){
     app.get('/login', (req,res) => {
         sess=req.session;
         if (sess.username){    
-            return res.send('woops already loggedin' + sess.username)
+            return res.send('woops already loggedin')
         }
         return res.render('login.ejs')
     });
@@ -118,14 +127,10 @@ module.exports=function(app){
     }); // end of the post
 
 
-    app.get('/session', (req,res) => {
-        console.log(sess);
-        if (sess.username) {return res.send(sess.username + " hello")};
-    });
-
-    app.get('/profile', (req,res) => {
-        var sess=req.session;
-        res.redirect('/' + sess.username);
+    app.get('/profile/:username', (req,res) => {
+        Users.findOne({username: req.params.username}, function (err, db_user){
+            res.render('profilepage', {user: db_user, moment: moment, count: db_user.projects_array.length});
+        })
     });
 
     //Here starts the facebook authentification routing

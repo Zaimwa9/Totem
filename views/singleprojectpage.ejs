@@ -1,0 +1,34 @@
+<!-- How I see it:
+This is gonna be a page with public info ? Displaying some stands, navigating to information pages etc
+Sort of vitrine website and will let you signup and login etc ...
+ -->
+
+<html>
+<h1> Hello, this is  <%=project.name %> project</h1>
+
+<body>
+    Edition: <%= project.edition %>
+    </br>
+    Led by <%= project.leader %>
+    </br>
+    since <%= moment(project.created_at).format('DD/MM/YY') %> </br>
+    </br>
+    It consists in : <%= project.description %>
+    </br>
+    We think it's part of this category: <%= project.category %>
+    </br>
+    </br>
+    </br>
+    Check out all the other members
+    <% for(i=0; i<count_members; i++) {%>  <!-- ici ce sera les photos des membres qui s'afficheront au liejisdjqdddllu d'un bouton -->
+    <a href='/profile/<%= project.members_array[i] %>'> <button type="submit"><%= project.members_array[i] %> </button> </a> </br> </br> <%  } %>
+
+    </br>
+    Interested people are:
+    XXXX
+
+    YYYY
+
+</body>
+
+</html>

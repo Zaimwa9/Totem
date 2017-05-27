@@ -1,4 +1,7 @@
-To compare passwords for authentification:
+Est ce que ça aurait eu un sens d'utiliser reddis quelque part ?
+Histoire des usernames facebook ?
+
+$$$ To compare passwords for authentification:
 
     user.comparePassword(auth_attempt.password, function(err, isMatch) {
         if (err) throw err;

@@ -1,0 +1,23 @@
+<!-- How I see it:
+This is gonna be a page with public info ? Displaying some stands, navigating to information pages etc
+Sort of vitrine website and will let you signup and login etc ...
+ -->
+
+<html>
+<h1> Hello, this is you </h1>
+
+<body>
+    <%= user.username %>
+    <%= count %>
+    <%= moment(user.created_at).format('DD/MM/YY') %> </br>
+    <img src = '<%= user.picture %>' />
+
+    </br>
+    </br>
+    </br>
+
+    <% for(i=0; i<count; i++) {%>
+    <a href='/projects/<%= user.projects_array[i] %>'> <button type="submit"><%= user.projects_array[i] %> </button> </a> </br> </br> <%  } %>
+</body>
+
+</html>

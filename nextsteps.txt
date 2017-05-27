@@ -7,7 +7,7 @@
     a) update & delete (single project page + owner)
     b) post a message (single project page)
     c) upvote a project (all & single project pages)
-    d) join a project (all & single project pages)
+    d) join a project (all & single project pages)   Will be on it
     e) being curious about a project (on the long-run = receiving the notifications)
 
 2) Filters on projects + search bar (Javascript client-side ?)
