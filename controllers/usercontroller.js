@@ -139,10 +139,22 @@ module.exports=function(app){
         passport.authenticate('facebook'));
 
     app.get('/auth/facebook/callback',
-        passport.authenticate('facebook', {failureRedirect: '/'}),
-        function(req,res){
+        passport.authenticate('facebook', {failureRedirect: '/'}), function(req,res){
+            Users.checkmail(req.session.passport.user, function(err,valid){
+                if (err) return err;
+                (valid) ? res.redirect('/') : res.render('enteremail.ejs'); 
+                })
+        });
+
+    //Here we handle the post method to add the email right after facebook authentication
+    app.post('/addemail', (req,res) => {
+        Users.findOneAndUpdate({facebookId: req.session.passport.user.facebookId}, {valid_email: true, email: req.body.email}, 
+        function(err, user){
+            if (err) {console.log(err); return (err)}
+            console.log(user + '   updated');
             res.redirect('/')
         });
+    })
     
     //To test user is authentified
     app.get('/testauth', ensureAuthenticated, function(req,res){

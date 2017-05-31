@@ -13,7 +13,7 @@ var passport = require('passport');
 var usercontroller=require('./controllers/usercontroller.js');
 var setupcontroller=require('./controllers/setupcontroller.js');
 var projectcontroller=require('./controllers/projectcontroller.js');
-var mailfunctions=require('./controllers/mailfunctions.js')
+var mailgun=require('./controllers/mailfunctions.js')
 
 var port=process.env.PORT || 3000;
 
@@ -56,7 +56,7 @@ setupcontroller(app);
 projectcontroller(app);
 
 app.get('/mailtest', function(req,res){
-  mailfunctions(), 
+  mailgun.applyProject({leader: 'Wood Zm' ,email: 'B00549848@essec.edu', applicant: 'victor', project:'festin', body: 'Je pense être un bon membre pour ton projet'}) 
   res.send('mail sent')
 });
 

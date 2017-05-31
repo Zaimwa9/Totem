@@ -9,6 +9,8 @@ var fs = require('fs')
 var busboy = require('connect-busboy');
 var Users = require ('../models/users');
 var moment = require('moment');
+var mailgun = require('./mailfunctions');
+
 
 function ensureAuthenticated(req, res, next) {
         if (req.isAuthenticated()) { console.log('authenticated'); return next(); }
@@ -56,6 +58,9 @@ module.exports=function(app){
         })
     })
 
+;
+
+    //Here we will handle the application to join a project that will send an email to the leader of the project
 
 // update a new project
 /*

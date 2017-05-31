@@ -9,6 +9,7 @@ var Schema=mongoose.Schema;
 var UserSchema = new Schema({
     username: { type: String, required: true, index: { unique: true } },
     email: String,
+    valid_email: Boolean,
     facebookId: String,
     picture: String,
     password: String,
@@ -16,6 +17,49 @@ var UserSchema = new Schema({
     projects_array: Array,
     created_at: Date
 });
+
+
+
+// This part is called when authenticating to facebook. If the user exists then it logs him and goes on
+// If this is the first time a user logs in then it creates a record in the database using facebook information
+UserSchema.statics.findOrCreatefb = function(profile, cb){
+
+    console.log('Checking facebook authentication');
+
+    Users.findOne({facebookId: profile.id}, function (err, user){
+        if (err) return cb(err);
+
+        if (user) {console.log('user found'); return cb(null,user)};
+
+        user= new Users ({
+            username: profile.displayName,
+            facebookId: profile.id,
+            role: 'user',
+            valid_email: false,
+            picture: profile.photos[0].value,
+            created_at: new Date().getTime()
+        });
+
+        user.save(function (err){
+            if (err) return err;
+            console.log(user + ' saved')
+        });
+    });
+}
+
+//A quick function to call each time you want to check if the guy has an email address
+UserSchema.statics.checkmail = function (user,cb) {
+    console.log('checking if email is correct');
+
+    Users.findOne({facebookId: user.facebookId}, function (err,db_user){
+        if (err) return cb(new Error('user not found'));
+
+        if (!db_user.valid_email) return cb(null, false);
+    
+        if (db_user.valid_email) return cb(null, true);
+    });
+}
+
 
 //encrypting the password using a middleware
 UserSchema.pre('save', function (next) {
@@ -40,7 +84,8 @@ UserSchema.pre('save', function (next) {
         });
 });
 
-// Create a new user
+// Method to create a new user with a classic authentification way
+// Will be used for admin
 UserSchema.statics.register= function(data, cb){
      
      var newuser= new Users ({
@@ -70,7 +115,10 @@ UserSchema.statics.register= function(data, cb){
     });
 };
 
-// password check
+
+
+
+// Crypted password method to authenticate with classic login
 
 UserSchema.statics.comparePassword = function(candidatePassword, obj, cb) {
     bcrypt.compare(candidatePassword, obj.password, function(err, isMatch) {
@@ -79,30 +127,17 @@ UserSchema.statics.comparePassword = function(candidatePassword, obj, cb) {
     });
 };
 
-UserSchema.statics.findOrCreatefb = function(profile, cb){
-    //console.log(profile);
-    console.log(profile.photos[0].value);
 
-    Users.findOne({facebookId: profile.id}, function (err, user){
-        if (err) return cb(err);
+var Users=mongoose.model('Users', UserSchema);
 
-        if (user) {console.log('user found'); return cb(null,user)};
+global.Users=Users;
 
-        user= new Users ({
-            username: profile.displayName,
-            facebookId: profile.id,
-            role: 'user',
-            picture: profile.photos[0].value,
-            created_at: new Date().getTime()
-        });
+module.exports=Users;
 
-        user.save(function (err){
-            if (err) return err;
-            console.log(user + ' saved')
-        });
-    });
-}
-/*
+
+/* This is the first attempt to have a model method to authenticate with classic login
+It will be used for the backoffice
+
 UserSchema.statics.login = function (data, cb){
     Users.findOne({username: data.username}, function (err, user){
         console.log(data.username + data.password);
@@ -122,11 +157,6 @@ UserSchema.statics.login = function (data, cb){
 };
 */
 
-var Users=mongoose.model('Users', UserSchema);
-
-global.Users=Users;
-
-module.exports=Users;
 
 
 
