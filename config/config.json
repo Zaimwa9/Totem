@@ -1,5 +1,7 @@
 {
     "user": "test",
     "pwd": "test123",
-    "serv":"@ds127321.mlab.com:27321/staging"
+    "serv":"@ds127321.mlab.com:27321/staging",
+    "facebook_id": "1013012775501570",
+    "facebook_secret": "de4dc85685771a3fa41b0eea0dbeee1b"
 }
