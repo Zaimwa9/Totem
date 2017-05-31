@@ -14,12 +14,17 @@ var usercontroller=require('./controllers/usercontroller.js');
 var setupcontroller=require('./controllers/setupcontroller.js');
 var projectcontroller=require('./controllers/projectcontroller.js');
 var mailgun=require('./controllers/mailfunctions.js')
-
+var Users= require('./models/users');
 var port=process.env.PORT || 3000;
 
 
 passport.serializeUser(function(user, cb) {
-  cb(null, user);
+  Users.findOne({facebookId: user.facebookId}, function(err, db_user){
+    if (err) return err;
+    user.email = db_user.email;
+    cb(null, user);
+  })
+  
 });
 
 passport.deserializeUser(function(obj, cb) {

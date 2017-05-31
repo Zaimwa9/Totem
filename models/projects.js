@@ -8,6 +8,7 @@ var Schema=mongoose.Schema;
 var ProjectSchema = new Schema({
     name: { type: String, required: true, index: { unique: true } },
     leader: { type: String, required: true },
+    leader_email: { type: String, required: true },
     members_count: Number,
     members_array: Array,
     description: String,
@@ -26,6 +27,7 @@ ProjectSchema.statics.adding = function(project, user, cb){
     var new_project = new Projects ({
         name: project.name,
         leader: user.username,
+        leader_email: req.session.passport.email,
         members_count: 1,
         members_array: [user.username],
         description: project.description,

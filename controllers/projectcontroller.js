@@ -57,10 +57,37 @@ module.exports=function(app){
             res.render('singleprojectpage', {project: project, count_members: project.members_count, moment: moment});
         })
     })
-
 ;
 
     //Here we will handle the application to join a project that will send an email to the leader of the project
+    //Will be nice to have a thank you note popping (@Dorian)
+
+    app.post('/projects/:projectname/application', (req, res) => {
+        Projects.findOne({name: req.params.projectname}, function(err, db_proj){
+            var obj = {
+                leader: db_proj.leader,
+                email_to: db_proj.leader_email,
+                applicant: req.session.passport.user.username,
+                project: req.params.projectname,
+                body: req.body.application,
+            }
+        mailgun.applyProject(obj, function(err, cb){
+            if (err) return err;
+            console.log('mail sent' + cb);
+            res.send('Application sent');
+            })
+        });
+    });
+
+    app.get('/updatewadii', function(req,res){
+        Projects.update({}, {leader_email: 'B00549848@essec.edu'}, {multi: true},
+        function(err,user){
+            if (err) return err;
+            res.send(user);
+        });
+    })
+
+
 
 // update a new project
 /*

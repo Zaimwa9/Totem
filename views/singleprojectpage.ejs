@@ -42,12 +42,12 @@ Sort of vitrine website and will let you signup and login etc ...
 </body>
 
 <script>
-    var test=0 //probablement rajouter un timer
+    var flag=0 
     function apply_new_input(){
-        if (test==0){
-        document.getElementById('application_area').innerHTML = '</br> <textarea id="test" style="width:300px; height:120px"> </textarea> </br>' +
-        '<form method="POST" action="/projects/' + '<%= project.name %>/application">' + '<button name="apply" value="member">Join the project</button> </form>';
-        test =1}
+        if (flag == 0){  //meaning the text area doesn't exist yet but to be improved @Dorian
+        document.getElementById('application_area').innerHTML = '<form method="POST" action="/projects/' + '<%= project.name %>/application">' + '</br> <textarea input type="text" id="application" name=application style="width:300px; height:120px"> </textarea> </br>' +
+        '<button name="apply" value="member">Join the project</button> </form>';
+        flag = 1}
     }
 </script>
 
