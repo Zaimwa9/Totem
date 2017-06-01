@@ -39,16 +39,22 @@ Sort of vitrine website and will let you signup and login etc ...
                                 <span id="application_area" onclick="apply_new_input()">
                                 <button> Apply here </button>
                                 </span>
+    <% if(user.username == project.leader && (auth)) { %>
+    <form method="POST" action="/projects/<%= project.name %>/delete">
+    <button name="delete" value="deleteproject"> Delete the project </button> </form>
+    <%} %>
 </body>
 
 <script>
-    var flag=0 
-    function apply_new_input(){
-        if (flag == 0){  //meaning the text area doesn't exist yet but to be improved @Dorian
-        document.getElementById('application_area').innerHTML = '<form method="POST" action="/projects/' + '<%= project.name %>/application">' + '</br> <textarea input type="text" id="application" name=application style="width:300px; height:120px"> </textarea> </br>' +
-        '<button name="apply" value="member">Join the project</button> </form>';
-        flag = 1}
+    var flag = 0
+    function apply_new_input() {
+        if (flag == 0) {  //meaning the text area doesn't exist yet but to be improved @Dorian
+            document.getElementById('application_area').innerHTML = '<form method="POST" action="/projects/' + '<%= project.name %>/application">' + '</br> <textarea input type="text" id="application" name=application style="width:300px; height:120px"> </textarea> </br>' +
+                '<button name="apply" value="member">Join the project</button> </form>';
+            flag = 1
+        }
     }
+
 </script>
 
 

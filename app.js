@@ -65,5 +65,14 @@ app.get('/mailtest', function(req,res){
   res.send('mail sent')
 });
 
+//// Quick update function to change historic projects to active
+app.get('/projectstoactive', (req,res) => {
+  Projects.update({active: null}, {active: true}, {multi: true}, function(err, result){
+    if (err) return err;
+    console.log('done ' + result);
+    res.send('done updating' + result)
+  })
+})
+
 app.listen(port);
 

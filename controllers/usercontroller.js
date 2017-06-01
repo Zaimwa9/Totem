@@ -36,17 +36,17 @@ module.exports=function(app){
     
     //Serves the landing page
     app.get('/', (req,res) => {
-        Projects.find({edition : 'Totem V'}, ['name', 'leader', 'members_count', 'created_at'], { sort: {created_at: -1}}, function (err, results, count){
+        Projects.find({edition : 'Totem V', active : true}, ['name', 'leader', 'members_count', 'created_at'], { sort: {created_at: -1}}, function (err, db_projects, count){
         if (err) return err;
         if (req.isAuthenticated())
             {
                 console.log(req.session.passport.user.username);
-                return res.render('index.ejs', {auth: req.isAuthenticated(), projects: results, count: results.length, username: req.session.passport.user.username});
+                return res.render('index.ejs', {auth: req.isAuthenticated(), projects: db_projects, count: db_projects.length, username: req.session.passport.user.username});
             }
         if (!req.isAuthenticated())
             {
                 console.log('no user logged so far');
-                return res.render('index.ejs', {auth: req.isAuthenticated(), projects: results, count: results.length});
+                return res.render('index.ejs', {auth: req.isAuthenticated(), projects: db_projects, count: db_projects.length});
             }
         });
     });

@@ -50,11 +50,15 @@ module.exports=function(app){
         });
     });
 
-    app.get('/projects/:projectname', (req,res) => {
+    app.get('/projects/:projectname', ensureAuthenticated, (req, res) => {
         Projects.findOne({name: req.params.projectname}, function (err, project){
             if (err) return err;
-            //res.send(project)
-            res.render('singleprojectpage', {project: project, count_members: project.members_count, moment: moment});
+            if (req.isAuthenticated)
+                res.render('singleprojectpage', {auth: req.isAuthenticated(), project: project, count_members: project.members_count, moment: moment, user: req.session.passport.user});
+            else 
+            { 
+                res.render('singleprojectpage', {auth: req.isAuthenticated(), project: project, count_members: project.members_count, moment: moment});
+            } 
         })
     })
 ;
@@ -79,7 +83,7 @@ module.exports=function(app){
         });
     });
 
-    app.get('/updatewadii', function(req,res){
+    app.get('/updatewadii', function(req, res){
         Projects.update({}, {leader_email: 'B00549848@essec.edu'}, {multi: true},
         function(err,user){
             if (err) return err;
@@ -87,7 +91,13 @@ module.exports=function(app){
         });
     })
 
-
+    app.post('/projects/:projectname/delete', function(req, res){
+        Projects.remove({name: req.params.projectname}, function (err){
+            if (err) {console.log(err); return err;}
+            console.log('Document removed');
+            res.send('Project deleted ' + req.params.projectname)
+        })
+    })
 
 // update a new project
 /*

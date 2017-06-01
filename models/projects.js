@@ -15,6 +15,8 @@ var ProjectSchema = new Schema({
     category: String,
     img: String,
     edition: String,
+    position: String,
+    active: Boolean,
     created_at: Date
 });
 
@@ -27,13 +29,14 @@ ProjectSchema.statics.adding = function(project, user, cb){
     var new_project = new Projects ({
         name: project.name,
         leader: user.username,
-        leader_email: req.session.passport.email,
+        leader_email: user.email,
         members_count: 1,
         members_array: [user.username],
         description: project.description,
         img: '',
         category: project.category,
         edition: 'Totem V',
+        active: true,
         created_at: new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '')
     });
 
