@@ -126,10 +126,22 @@ module.exports=function(app){
         };
     }); // end of the post
 
-
+/*
     app.get('/profile/:username', (req,res) => {
         Users.findOne({username: req.params.username}, function (err, db_user){
             res.render('profilepage', {user: db_user, moment: moment, count: db_user.projects_array.length});
+        })
+    });
+    */
+
+    app.get('/profile/:username', (req,res) => {
+        Users.findOne({username: req.params.username}, function (err, db_user){
+            if (err) return err;
+            //console.log(db_user);
+            Users.activeprojects(db_user, function(err, cb){
+                res.render('profilepage', {user: db_user, moment: moment, count: cb.length, all_projects: cb});
+            })
+            //res.render('profilepage', {user: db_user, moment: moment, count: db_user.projects_array.length});
         })
     });
 
@@ -169,6 +181,15 @@ module.exports=function(app){
     app.get('/logout', function(req, res){
         req.logout();
         res.redirect('/');
-    })
+    });
+
+    // testing active projects
+    app.get('/testarray', function(req, res){
+        Users.activeprojects(req.session.passport.user, function(cb){
+            console.log(cb);
+        });
+        res.send('check console')
+    });
+
 
 } //end of the module export

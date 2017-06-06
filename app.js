@@ -1,13 +1,12 @@
 var express=require('express');
 var app=express();
 var config=require('./config');
-var Users=require('./models/users.js');
+var Users = require('./models/users')
 var mongoose=require('mongoose');
 var bodyParser=require('body-parser');
 var expressValidator=require('express-validator');
 const session = require('express-session');
 var passport = require('passport');
-
 
 // require controllers
 var usercontroller=require('./controllers/usercontroller.js');
@@ -68,6 +67,14 @@ app.get('/mailtest', function(req,res){
 //// Quick update function to change historic projects to active
 app.get('/projectstoactive', (req,res) => {
   Projects.update({active: null}, {active: true}, {multi: true}, function(err, result){
+    if (err) return err;
+    console.log('done ' + result);
+    res.send('done updating' + result)
+  })
+});
+// to fill up the members_array
+app.get('/membersarray', (req,res) => {
+  Projects.update({}, {members_array: "5927f4005cba963278d8ecc2"}, {multi: true}, function(err, result){
     if (err) return err;
     console.log('done ' + result);
     res.send('done updating' + result)

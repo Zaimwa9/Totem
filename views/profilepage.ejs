@@ -17,7 +17,7 @@ Sort of vitrine website and will let you signup and login etc ...
     </br>
     <h3> The projects you follow </h3>
     <% for(i=0; i<count; i++) {%>
-    <a href='/projects/<%= user.projects_array[i] %>'> <button type="submit"><%= user.projects_array[i] %> </button> </a> </br> </br> <%  } %>
+    <a href='/projects/<%= all_projects[i].name %>'> <button type="submit"><%= all_projects[i].name %> </button> </a> </br> </br> <%  } %>
 </body>
 
 </html>

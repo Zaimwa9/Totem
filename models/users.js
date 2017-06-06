@@ -3,6 +3,7 @@
 var mongoose=require('mongoose');
 var bcrypt=require('bcrypt');
 var SALT_WORK_FACTOR=10;
+var Projects = require('./projects.js');
 
 var Schema=mongoose.Schema;
 
@@ -14,7 +15,7 @@ var UserSchema = new Schema({
     picture: String,
     password: String,
     role: String,
-    projects_array: Array,
+  //projects_array: Array,
     created_at: Date
 });
 
@@ -115,9 +116,6 @@ UserSchema.statics.register= function(data, cb){
     });
 };
 
-
-
-
 // Crypted password method to authenticate with classic login
 
 UserSchema.statics.comparePassword = function(candidatePassword, obj, cb) {
@@ -126,9 +124,17 @@ UserSchema.statics.comparePassword = function(candidatePassword, obj, cb) {
         cb(null, isMatch);
     });
 };
+// Replacing the projects_array field with a function that returns an array
+UserSchema.statics.activeprojects = function(user, cb){
+    Projects.find({members_array: user._id, active: true}, function (err, projects_array){
+        if (err) return cb(err);
+        console.log(projects_array);
+        return cb(null, projects_array);
+    });
+};
 
 
-var Users=mongoose.model('Users', UserSchema);
+var Users = mongoose.model('Users', UserSchema);
 
 global.Users=Users;
 

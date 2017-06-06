@@ -29,7 +29,7 @@ Sort of vitrine website and will let you signup and login etc ...
                         Check out all the other members
                         <% for(i=0; i<count_members; i++) {%>
                             <!-- ici ce sera les photos des membres qui s'afficheront au liejisdjqdddllu d'un bouton -->
-                            <a href='/profile/<%= project.members_array[i] %>'> <button type="submit"><%= project.members_array[i] %> </button> </a>
+                            <a href='/profile/<%= project.members_array[i].username %>'> <button type="submit"><%= project.members_array[i].username %> </button> </a>
                             </br>
                             </br>
                             <%  } %>
@@ -39,6 +39,15 @@ Sort of vitrine website and will let you signup and login etc ...
                                 <span id="application_area" onclick="apply_new_input()">
                                 <button> Apply here </button>
                                 </span>
+
+    <!-- This part displays the curious button as long as the user is authentified. NB: Will need a check to removes the button once curious -->
+    <% if((auth)) { %>
+    <form method="POST" action="/projects/<%= project.name %>/curious">
+    <button name="curious" value="curiousabout"> Curious/interested </button> </form>
+    <%} %>
+
+
+    <!-- This is a if condition that checks if the guy is the leader and allows him to delete the project -->
     <% if(user.username == project.leader && (auth)) { %>
     <form method="POST" action="/projects/<%= project.name %>/delete">
     <button name="delete" value="deleteproject"> Delete the project </button> </form>

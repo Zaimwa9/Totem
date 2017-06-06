@@ -1,21 +1,22 @@
 /* In here we will add all the functions as methods to the project model and they will be called in the UserController */
 // Should we limit the number of projects led by each member ?
 
-var mongoose=require('mongoose');
-
-var Schema=mongoose.Schema;
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+var Users = require('./users')
 
 var ProjectSchema = new Schema({
     name: { type: String, required: true, index: { unique: true } },
     leader: { type: String, required: true },
     leader_email: { type: String, required: true },
     members_count: Number,
-    members_array: Array,
+    members_array: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Users'}],
+    curious_array: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Users'}],
     description: String,
     category: String,
     img: String,
     edition: String,
-    position: String,
+    geoposition: String,
     active: Boolean,
     created_at: Date
 });
@@ -30,8 +31,8 @@ ProjectSchema.statics.adding = function(project, user, cb){
         name: project.name,
         leader: user.username,
         leader_email: user.email,
-        members_count: 1,
-        members_array: [user.username],
+        members_array: [user._id],
+        curious_array: [],
         description: project.description,
         img: '',
         category: project.category,
@@ -60,7 +61,7 @@ ProjectSchema.statics.adding = function(project, user, cb){
 
 
 // Here starts the update method (think to check in the controller that only the owner can update)
-    ProjectSchema.statics.updateproject = function (field_name, old_project_name, new_value, user, cb){
+ProjectSchema.statics.updateproject = function (field_name, old_project_name, new_value, user, cb){
         console.log(old_project);
         console.log(modified_project);
         console.log(user);
@@ -91,6 +92,25 @@ ProjectSchema.statics.adding = function(project, user, cb){
         };
     };
 
+// This method allows a user to join a project as a curious member (show interest)
+/*ProjectSchema.statics.newcurious = function(project, user, cb){
+    Projects.update({name: project.name}, {$push: {curious_array: user._id}}, function(err, updated_project){
+        console.log(user._id + 'user_id');
+        if (err) return cb(err);
+        console.log('project method:  ' + project);
+        console.log('array attempt:  ' + project.members_array)
+        return cb(null, updated_project); 
+    });
+}; */
+ProjectSchema.methods.addCurious = function(user, cb){
+    this.curious_array.push(user._id);
+    this.save(cb); 
+};
+
+ProjectSchema.methods.removeCurious = function(user, cb){
+    this.curious_array.push(user._id);
+    this.save(cb); 
+};
 
 var Projects=mongoose.model('Projects', ProjectSchema);
 
