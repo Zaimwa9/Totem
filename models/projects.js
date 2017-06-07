@@ -92,7 +92,16 @@ ProjectSchema.statics.updateproject = function (field_name, old_project_name, ne
         };
     };
 
-
+// This method allows a user to join a project as a curious member (show interest)
+/*ProjectSchema.statics.newcurious = function(project, user, cb){
+    Projects.update({name: project.name}, {$push: {curious_array: user._id}}, function(err, updated_project){
+        console.log(user._id + 'user_id');
+        if (err) return cb(err);
+        console.log('project method:  ' + project);
+        console.log('array attempt:  ' + project.members_array)
+        return cb(null, updated_project); 
+    });
+}; */
 ProjectSchema.methods.addCurious = function(user, cb){
     this.curious_array.push(user._id);
     this.save(cb); 

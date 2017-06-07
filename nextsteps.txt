@@ -15,12 +15,3 @@
 3) Your own projects (Javascript client-side ?)
 
 4) Notification system ?
-
-
-/*
-statics fourni des méthodes sans instance
-si tu ajoutes des functions dans `Schema.methods` elle seront ajouter que quand tu query l'object en db
-
-[10:56] 
-et tu pourras utiliser des `this` pour referer au data dans l'object
-*/
