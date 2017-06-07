@@ -108,9 +108,11 @@ ProjectSchema.methods.addCurious = function(user, cb){
 };
 
 ProjectSchema.methods.removeCurious = function(user, cb){
-    this.curious_array.push(user._id);
+    var index = this.curious_array.indexOf(user._id);
+    if (index > -1) {
+        this.curious_array.splice(index, 1);
     this.save(cb); 
-};
+}};
 
 var Projects=mongoose.model('Projects', ProjectSchema);
 

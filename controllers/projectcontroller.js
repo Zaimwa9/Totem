@@ -66,15 +66,21 @@ module.exports=function(app){
     app.get('/projects/:projectname', ensureAuthenticated, (req, res) => {
         Projects.findOne({name: req.params.projectname})
         .populate('members_array')
+        .populate('curious_array')
         .exec(function (err, project){
             if (err) return err;
             if (req.isAuthenticated)
-            {   console.log(project);
-                res.render('singleprojectpage', {auth: req.isAuthenticated(), project: project, count_members: project.members_array.length, moment: moment, user: req.session.passport.user});
+            {   
+                isCurious = project.curious_array.map(object => object._id).some(id => id.toString() == req.session.passport.user._id.toString())
+                console.log(req.session.passport.user._id + ' session passport');
+                console.log(project.curious_array.map(object => object._id));
+                console.log(isCurious);
+
+                res.render('singleprojectpage', {auth: req.isAuthenticated(), isCurious: isCurious, project: project, count_members: project.members_array.length, count_curious: project.curious_array.length, moment: moment, user: req.session.passport.user});
             }
             else 
             { 
-                res.render('singleprojectpage', {auth: req.isAuthenticated(), project: project, count_members: project.members_array.length, moment: moment});
+                res.render('singleprojectpage', {auth: req.isAuthenticated(), project: project, count_members: project.members_array.length, count_curious: project.curious_array.length, moment: moment});
             }
         })
     });
@@ -119,26 +125,27 @@ module.exports=function(app){
             res.send('Project deleted ' + req.params.projectname)
         });
     });
-/*
-    app.post('/projects/:projectname/curious', (req, res) => { 
-        Projects.find({name: req.params.projectname}, function (err, db_project){
-            console.log(db_project + '   db');
-            Projects.newcurious(db_project, req.session.passport.user, function(err, cb){
-                if (err) return (err);
-                res.send(JSON.stringify(cb) + 'updated');
-            })
-        })
-    })
-*/
-app.post('/projects/:projectname/newcurious', (req, res) => { 
+
+// This handles the post request to become curious about the project
+    app.post('/projects/:projectname/newcurious', (req, res) => { 
         Projects.findOne({name: req.params.projectname}, function (err, db_project){
             db_project.addCurious(req.session.passport.user, function(err, cb){
                 if (err) return (err);
                 console.log(cb + 'updated');
-                res.send('updated');
+                res.redirect('/projects/'+ db_project.name);
             }) 
-        })
-    })
+        });
+    });
+
+    app.post('/projects/:projectname/removecurious', (req, res) => { 
+        Projects.findOne({name: req.params.projectname}, function (err, db_project){
+            db_project.removeCurious(req.session.passport.user, function(err, cb){
+                if (err) return (err);
+                console.log(cb + 'updated');
+                res.redirect('/projects/'+ db_project.name);
+            });
+        });
+    });
 
 
 /*
