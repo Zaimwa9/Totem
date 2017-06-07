@@ -46,7 +46,7 @@ module.exports=function(app){
 
     app.post('/projects/:projectname/image', type, (req, res) => {
         console.log(req.file);
-        var target_path = `C:/Users/Wadii/Desktop/totem/totem/public/uploads/`+ req.file.originalname;
+        var target_path = `Tester/`+ req.file.originalname;
 
         Projects.update({name: req.params.projectname}, {img: target_path}, function(err, db_project) {
             this.img=req.file.originalname;
