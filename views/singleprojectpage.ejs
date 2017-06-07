@@ -7,6 +7,10 @@ Sort of vitrine website and will let you signup and login etc ...
 <h1> Hello, this is
     <%=project.name %> project</h1>
 
+<form method="POST" action="/projects/<%= project.name %>/image" enctype="multipart/form-data">
+image: <input type="file", id="img" name="image" </br>
+<input type="submit" value="submit" /> </br> </br>
+
 <body>
     Edition:
     <%= project.edition %>

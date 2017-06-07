@@ -5,8 +5,8 @@ var Projects = require('../models/projects');
 var bodyParser = require('body-parser');
 var urlencodedParser = bodyParser.urlencoded({extended:false}); // this part is used being passed as a callback in the post statements
 var jsonParser = bodyParser.json(); // Same but parses Json objects
-var fs = require('fs')
-var busboy = require('connect-busboy');
+var fs = require('fs');
+var multer = require('multer');
 var moment = require('moment');
 var mailgun = require('./mailfunctions');
 var Users= require('../models/users');
@@ -18,27 +18,52 @@ function ensureAuthenticated(req, res, next) {
 }
 
 
-
 module.exports=function(app){
 
-    app.use(busboy());
+    var upload = multer({
+        dest: __dirname + '../public/uploads/' 
+    }); 
+    var type = upload.single('image');
+
 // First page to create a new project
-    app.get('/newprojectpage', ensureAuthenticated ,(req,res) => {
+    app.get('/newprojectpage', ensureAuthenticated , (req, res) => {
         (req.isAuthenticated) ? res.render('newproject.ejs') : res.send('not auth')
         /*if (req.isAuthenticated) {res.render('newproject.ejs')} else {
         res.send('not auth')} */
     });
-    
-    app.post('/newproject', urlencodedParser, (req,res) => {
+     
+    app.post('/newproject', urlencodedParser, (req, res) => {
         current_proj=req.body;
 
-        global.Projects.adding(current_proj, req.session.passport.user , function(err, proj){
+        global.Projects.adding(current_proj, req.session.passport.user, function(err, proj){
             if (err) return res.send(err);
             Users.findOneAndUpdate({username: req.session.passport.user.username}, {$push: {projects_array : current_proj.name}}, function (err, user){
             if (err) return err
             res.send(proj + ' saved and user modified'+ user)
             });
         });
+    });
+
+    app.post('/projects/:projectname/image', type, (req, res) => {
+        console.log(req.file);
+        var target_path = `C:/Users/Wadii/Desktop/totem/totem/public/uploads/`+ req.file.originalname;
+
+        Projects.update({name: req.params.projectname}, {img: target_path}, function(err, db_project) {
+            this.img=req.file.originalname;
+            db_project.save;
+        })
+
+        // original name of the file + destination
+        
+        //var target_path = '../public/uploads/' + req.file.originalname;
+        //source path of the stream
+        var src = fs.createReadStream(req.file.path);
+        var dest = fs.createWriteStream(target_path);
+
+        src.pipe(dest);
+        src.on('end', function() {res.send('complete');});
+        src.on('error', function(err) { res.send('error');});
+        
     });
 
     app.get('/projectlist', (req,res) => {
@@ -48,6 +73,7 @@ module.exports=function(app){
             res.render('allprojects.ejs', {projects: results, count: results.length} )
         });
     }); 
+
 /*  Projectlist version populating members_array. Will depend whether we need it in a future version
 
     app.get('/projectlist', (req,res) => {
@@ -147,14 +173,7 @@ module.exports=function(app){
         });
     });
 
-
-/*
-statics fourni des méthodes sans instance
-si tu ajoutes des functions dans `Schema.methods` elle seront ajouter que quand tu query l'object en db
-
-[10:56] 
-et tu pourras utiliser des `this` pour referer au data dans l'object
-*/
+} //end of the module export
 
 
 // update a new project
@@ -180,4 +199,4 @@ et tu pourras utiliser des `this` pour referer au data dans l'object
   });
   */
 
-} //end of the module export
+
