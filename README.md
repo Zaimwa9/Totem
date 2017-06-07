@@ -1,6 +1,6 @@
 # Totem
 
-Totem is a collaborative festival (https://www.facebook.com/TOTEMCREATE/) where every participants has to lead or engage himself in a project.
+Totem is a collaborative festival (https://www.facebook.com/TOTEMCREATE/) where every participant has to lead or engage himself in a project.
 
 Creating Totem's website is, let's say, my way to make it live and a super project to learn node.js and build my first web-application.
 I am creating the backend infrastructure by myself and will participate in coding the front.
