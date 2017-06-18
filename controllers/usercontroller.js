@@ -41,7 +41,7 @@ module.exports=function(app){
         if (req.isAuthenticated())
             {
                 console.log(req.session.passport.user.username);
-                return res.render('index.ejs', {auth: req.isAuthenticated(), projects: db_projects, count: db_projects.length, username: req.session.passport.user.username});
+                return res.render('index.ejs', {auth: req.isAuthenticated(), projects: db_projects, count: db_projects.length, username: req.session.passport.user.username, userid: req.session.passport._id});
             }
         if (!req.isAuthenticated())
             {
@@ -126,16 +126,9 @@ module.exports=function(app){
         };
     }); // end of the post
 
-/*
-    app.get('/profile/:username', (req,res) => {
-        Users.findOne({username: req.params.username}, function (err, db_user){
-            res.render('profilepage', {user: db_user, moment: moment, count: db_user.projects_array.length});
-        })
-    });
-    */
 
-    app.get('/profile/:username', (req,res) => {
-        Users.findOne({username: req.params.username}, function (err, db_user){
+    app.get('/profile/:userid', (req,res) => {
+        Users.findOne({_id: req.params.userid}, function (err, db_user){
             if (err) return err;
             //console.log(db_user);
             Users.activeprojects(db_user, function(err, cb){

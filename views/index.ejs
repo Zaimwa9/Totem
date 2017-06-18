@@ -19,13 +19,13 @@ Sort of vitrine website and will let you signup and login etc ...
         <a href="/logout"> <button type="button"> logout </button> </a> <%} %>
         </br>
         <% if (auth) { %>
-        <a href='/profile/<%= username %>'> <button type="button"> profile </button> </a> <%} %>        
+        <a href='/profile/<%= userid %>'> <button type="button"> profile </button> </a> <%} %>        
         
         </br>
             <h1> 10 Most popular projects </h1>
             
         <% for(i=0; i<count; i++)  {%> 
-        <a href='/projects/<%= projects[i].name %>'> </br> <button type="submit"><%= projects[i].name %>  <% } %> </button> 
+        <a href='/projects/<%= projects[i]._id %>'> </br> <button type="submit"><%= projects[i].name %>  <% } %> </button> 
     </body>
 
 </html>

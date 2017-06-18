@@ -7,6 +7,6 @@ Sort of vitrine website and will let you signup and login etc ...
     <h1> Check all the projects that we have </h1>
     <body> 
         <% for(i=0; i<count; i++) {%>
-        <a href='/projects/<%= projects[i].name %>'> <button type="submit"><%= projects[i].name %> <% } %></button> 
+        <a href='/projects/<%= projects[i]._id %>'> <button type="submit"><%= projects[i].name %> <% } %></button> 
     </body>
 </html>

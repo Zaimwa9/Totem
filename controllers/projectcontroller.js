@@ -44,13 +44,12 @@ module.exports=function(app){
         });
     });
 
-    app.post('/projects/:projectname/image', type, (req, res) => {
+    app.post('/projects/image/:projectid', type, (req, res) => {
         console.log(req.file);
         var target_path = `Tester/`+ req.file.originalname;
 
-        Projects.update({name: req.params.projectname}, {img: target_path}, function(err, db_project) {
-            this.img=req.file.originalname;
-            db_project.save;
+        Projects.update({_id: req.params.projectid}, {img: target_path}, function(err, db_project) {
+            if (err) return (err);
         })
 
         // original name of the file + destination
@@ -61,8 +60,12 @@ module.exports=function(app){
         var dest = fs.createWriteStream(target_path);
 
         src.pipe(dest);
-        src.on('end', function() {res.send('complete');});
-        src.on('error', function(err) { res.send('error');});
+        
+        //listens on events end/error to send response
+        src.on('end', function() {
+            res.send('complete');});
+        src.on('error', function(err) {
+            res.send('error');});
         
     });
 
@@ -89,8 +92,8 @@ module.exports=function(app){
     });
 */    
 
-    app.get('/projects/:projectname', ensureAuthenticated, (req, res) => {
-        Projects.findOne({name: req.params.projectname})
+    app.get('/projects/:projectid', ensureAuthenticated, (req, res) => {
+        Projects.findOne({_id: req.params.projectid})
         .populate('members_array')
         .populate('curious_array')
         .exec(function (err, project){
@@ -114,11 +117,11 @@ module.exports=function(app){
     //Here we will handle the application to join a project that will send an email to the leader of the project
     //Will be nice to have a thank you note popping (@Dorian)
 
-    app.post('/projects/:projectname/application', (req, res) => {
+    app.post('/projects/:projectid/application', (req, res) => {
         if (req.body.application.length < 10){
             return res.send('please insert a text');
         }
-        Projects.findOne({name: req.params.projectname}, function(err, db_proj){
+        Projects.findOne({_id: req.params.projectid}, function(err, db_proj){
             var obj = {
                 leader: db_proj.leader,
                 email_to: db_proj.leader_email,
@@ -143,18 +146,18 @@ module.exports=function(app){
     });
 
 // This part uses the projectname to delete the project. Actually it just sets to false the "active" field
-    app.post('/projects/:projectname/delete', (req, res) => {
+    app.post('/projects/:projectid/delete', (req, res) => {
             //Projects.remove({name: req.params.projectname}, 
-            Projects.update({name: req.params.projectname}, {active: false}, function (err){
+            Projects.update({_id: req.params.projectid}, {active: false}, function (err){
             if (err) {console.log(err); return err;}
             console.log('Document removed');
-            res.send('Project deleted ' + req.params.projectname)
+            res.send('Project deleted ' + req.params.projectid)
         });
     });
 
 // This handles the post request to become curious about the project
-    app.post('/projects/:projectname/newcurious', (req, res) => { 
-        Projects.findOne({name: req.params.projectname}, function (err, db_project){
+    app.post('/projects/:projectid/newcurious', (req, res) => { 
+        Projects.findOne({_id: req.params.projectid}, function (err, db_project){
             db_project.addCurious(req.session.passport.user, function(err, cb){
                 if (err) return (err);
                 console.log(cb + 'updated');
@@ -163,8 +166,8 @@ module.exports=function(app){
         });
     });
 
-    app.post('/projects/:projectname/removecurious', (req, res) => { 
-        Projects.findOne({name: req.params.projectname}, function (err, db_project){
+    app.post('/projects/:projectid/removecurious', (req, res) => { 
+        Projects.findOne({_id: req.params.projectid}, function (err, db_project){
             db_project.removeCurious(req.session.passport.user, function(err, cb){
                 if (err) return (err);
                 console.log(cb + 'updated');
@@ -174,29 +177,3 @@ module.exports=function(app){
     });
 
 } //end of the module export
-
-
-// update a new project
-/*
-    app.post('/project/:projectname/:username/update', urlencodedParser, (req,res) => {
-        sess=req.session;
-            if (req.body.name)
-        // here pass the elements to an update method
-
-    }) // end of the post update
-*/
-    /*
-    // On routes where bucket_id param is set, we validate the user is authorized before loading it
-  bucketRouter.param('bucket', function(req, res, next, bucket_id) {
-    if (!mongoose.Types.ObjectId.isValid(bucket_id))
-      return res.status(403).send({msg: "Invalid bucket ID"})
-
-    auth.ensureAuthorizedAccessToBucket(req, res, function(err) {
-      if (err) return next(err);
-
-      ctrl.bucketController.load(req, res, next);
-    });
-  });
-  */
-
-

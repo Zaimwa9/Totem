@@ -7,10 +7,10 @@ Sort of vitrine website and will let you signup and login etc ...
 <h1> Hello, this is
     <%=project.name %> project</h1>
 
-<form method="POST" action="/projects/<%= project.name %>/image" enctype="multipart/form-data">
+<form method="POST" action="/projects/image/<%= project._id %>" enctype="multipart/form-data">
 image: <input type="file", id="img" name="image" </br>
 <input type="submit" value="submit" /> </br> </br>
-
+</form>
 <body>
     Edition:
     <%= project.edition %>
@@ -38,7 +38,7 @@ image: <input type="file", id="img" name="image" </br>
                         Check out all the other members
                         <% for(i=0; i<count_members; i++) {%>
                             <!-- ici ce sera les photos des membres qui s'afficheront au liejisdjqdddllu d'un bouton -->
-                            <a href='/profile/<%= project.members_array[i].username %>'> <button type="submit"><%= project.members_array[i].username %> </button> </a>
+                            <a href='/profile/<%= project.members_array[i]._id %>'> <button type="submit"><%= project.members_array[i].username %> </button> </a>
                             </br>
                             </br>
                             <%  } %>
@@ -49,7 +49,7 @@ image: <input type="file", id="img" name="image" </br>
                         <%if (count_curious>0) {%>Check out all the curious guys
                         <% for(i=0; i<count_curious; i++) {%>
                             <!-- ici ce sera les photos des membres qui s'afficheront au liejisdjqdddllu d'un bouton -->
-                            <a href='/profile/<%= project.curious_array[i].username %>'> <button type="submit"><%= project.curious_array[i].username %> </button> </a>
+                            <a href='/profile/<%= project.curious_array[i]._id %>'> <button type="submit"><%= project.curious_array[i].username %> </button> </a>
                             </br>
                             </br>
                             <% } %>
@@ -62,16 +62,16 @@ image: <input type="file", id="img" name="image" </br>
 
     <!-- This part displays the curious button as long as the user is authentified. NB: Will need a check to removes the button once curious -->
     <% if((auth) && (!isCurious)) { %>
-    <form method="POST" action="/projects/<%= project.name %>/newcurious">
+    <form method="POST" action="/projects/<%= project._id %>/newcurious">
     <button name="curious" value="true"> Curious/interested </button> </form>
     <%} else { %>
-    <form method="POST" action="/projects/<%= project.name %>/removecurious">
+    <form method="POST" action="/projects/<%= project._id %>/removecurious">
     <button name="curious" value="false"> Ne plus être curieux </button> </form>
     <% } %>
 
     <!-- This is a if condition that checks if the guy is the leader and allows him to delete the project -->
     <% if(user.username == project.leader && (auth)) { %>
-    <form method="POST" action="/projects/<%= project.name %>/delete">
+    <form method="POST" action="/projects/<%= project._id %>/delete">
     <button name="delete" value="deleteproject"> Delete the project </button> </form>
     <%} %>
 </body>
