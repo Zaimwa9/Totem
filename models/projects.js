@@ -23,7 +23,7 @@ var ProjectSchema = new Schema({
 
 // To create a project we'll need: the initial inputs + the creator user object + maybe the members he will add
 // In project we should have: project.name, project.leader, project.category, project.description, project.img
-ProjectSchema.statics.adding = function(project, user, cb){
+ProjectSchema.statics.adding = function(project, user, image_path, cb){
     console.log(project);
     console.log(user);
     
@@ -34,7 +34,7 @@ ProjectSchema.statics.adding = function(project, user, cb){
         members_array: [user._id],
         curious_array: [],
         description: project.description,
-        img: '',
+        img: image_path,
         category: project.category,
         edition: 'Totem V',
         active: true,

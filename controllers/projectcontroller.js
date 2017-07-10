@@ -11,6 +11,11 @@ var moment = require('moment');
 var mailgun = require('./mailfunctions');
 var Users= require('../models/users');
 
+var upload = multer({
+        dest: __dirname + '/../assets/uploads/' 
+    }); 
+var type = upload.single('image');
+
 function ensureAuthenticated(req, res, next) {
         if (req.isAuthenticated()) { console.log('access granted'); return next(); }
         console.log('denied');
@@ -32,43 +37,25 @@ module.exports=function(app){
         res.send('not auth')} */
     });
      
-    app.post('/newproject', urlencodedParser, (req, res) => {
+    app.post('/newproject', urlencodedParser, type, (req, res) => {
         current_proj=req.body;
 
-        global.Projects.adding(current_proj, req.session.passport.user, function(err, proj){
+        var target_path = __dirname + '/../public/uploads/' + req.file.originalname;
+        var db_image = '/uploads/' + req.file.originalname; 
+
+        global.Projects.adding(current_proj, req.session.passport.user, db_image, function(err, proj){
             if (err) return res.send(err);
-            Users.findOneAndUpdate({username: req.session.passport.user.username}, {$push: {projects_array : current_proj.name}}, function (err, user){
-            if (err) return err
-            res.send(proj + ' saved and user modified'+ user)
-            });
+            var src = fs.createReadStream(req.file.path);
+            var dest = fs.createWriteStream(target_path);
+            src.pipe(dest);
+            src.on('end', function (){
+                Users.findOneAndUpdate({username: req.session.passport.user.username}, {$push: {projects_array : current_proj.name}}, function (err, user){
+                if (err) return err
+                res.send(proj + ' saved and user modified'+ user)
+                });
+             })
         });
     });
-
-    app.post('/projects/image/:projectid', type, (req, res) => {
-        console.log(req.file);
-        var target_path = `Tester/`+ req.file.originalname;
-
-        Projects.update({_id: req.params.projectid}, {img: target_path}, function(err, db_project) {
-            if (err) return (err);
-        })
-
-        // original name of the file + destination
-        
-        //var target_path = '../public/uploads/' + req.file.originalname;
-        //source path of the stream
-        var src = fs.createReadStream(req.file.path);
-        var dest = fs.createWriteStream(target_path);
-
-        src.pipe(dest);
-        
-        //listens on events end/error to send response
-        src.on('end', function() {
-            res.send('complete');});
-        src.on('error', function(err) {
-            res.send('error');});
-        
-    });
-
     app.get('/projectlist', (req,res) => {
         Projects.find({$and: [{edition : 'Totem V', active: true}]}, ['name', 'leader', 'members_count', 'created_at'], { sort: {created_at: -1}}, function (err, results, count){
             if (err) return err;
@@ -77,20 +64,7 @@ module.exports=function(app){
         });
     }); 
 
-/*  Projectlist version populating members_array. Will depend whether we need it in a future version
 
-    app.get('/projectlist', (req,res) => {
-        Projects.find({edition : 'Totem V', active: true}, 
-        ['name', 'leader', 'members_count', 'created_at'], 
-        { sort: {created_at: -1}})
-        .populate(members_array)
-        .exec(function (err, results, count){
-            if (err) return err;
-            console.log(results.length);
-            res.render('allprojects.ejs', {projects: results, count: results.length} )
-        });
-    });
-*/    
 
     app.get('/projects/:projectid', ensureAuthenticated, (req, res) => {
         Projects.findOne({_id: req.params.projectid})
@@ -177,3 +151,46 @@ module.exports=function(app){
     });
 
 } //end of the module export
+
+
+/*  Projectlist version populating members_array. Will depend whether we need it in a future version
+
+    app.get('/projectlist', (req,res) => {
+        Projects.find({edition : 'Totem V', active: true}, 
+        ['name', 'leader', 'members_count', 'created_at'], 
+        { sort: {created_at: -1}})
+        .populate(members_array)
+        .exec(function (err, results, count){
+            if (err) return err;
+            console.log(results.length);
+            res.render('allprojects.ejs', {projects: results, count: results.length} )
+        });
+    });
+*/    
+
+/* This part is no longer required at the moment since I fixed the upload of the image in the inital adding
+    app.post('/projects/image/:projectid', type, (req, res) => {
+        console.log(req.file);
+        var target_path = `Tester/`+ req.file.originalname;
+
+        Projects.update({_id: req.params.projectid}, {img: target_path}, function(err, db_project) {
+            if (err) return (err);
+        })
+
+        // original name of the file + destination
+        
+        //var target_path = '../public/uploads/' + req.file.originalname;
+        //source path of the stream
+        var src = fs.createReadStream(req.file.path);
+        var dest = fs.createWriteStream(target_path);
+
+        src.pipe(dest);
+        
+        //listens on events end/error to send response
+        src.on('end', function() {
+            res.send('complete');});
+        src.on('error', function(err) {
+            res.send('error');});
+        
+    });
+*/

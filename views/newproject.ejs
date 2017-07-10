@@ -11,16 +11,14 @@ NB: from the form, it's the name that's gonna be parsed. "id" is used in the DOM
     <body>
         <h3> Welcome, would be nice to add your own project to Totem ! </h3>
 
-        <form method="POST" action="/newproject">
+        <form method="POST" action="/newproject" enctype="multipart/form-data">
             name: <input type="text" id="name" name="name" /><br /> 
             category: <input type="text" id="category" name="category" /><br />
             description: <input type="text" id="description" name="description" /><br />
+            image: <input type="file" name="image"> <br>
             <input type="submit" value="submit" />
         </form>
     </body>
 
 </html>
 
-<form method="POST" action="/newproject/image" enctype="multipart/form-data">
-image: <input type="file", id="img" name="image" </br>
-<input type="submit" value="submit" />
