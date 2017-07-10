@@ -15,7 +15,8 @@ var projectcontroller=require('./controllers/projectcontroller.js');
 var mailgun=require('./controllers/mailfunctions.js')
 var Users= require('./models/users');
 var port=process.env.PORT || 3000;
-
+var mgconfig = require('./config/index.js')
+const MongoStore = require('connect-mongo')(session);
 
 passport.serializeUser(function(user, cb) {
   Users.findOne({facebookId: user.facebookId}, function(err, db_user){
@@ -29,15 +30,22 @@ passport.serializeUser(function(user, cb) {
 passport.deserializeUser(function(obj, cb) {
   cb(null, obj);
 });
+var db = mongoose.connect(mgconfig.getDbConnectionstring(), function() {
+    console.log('successfully connected')
+});
 
+/*
 mongoose.connect(config.getDbConnectionstring(),function(){
         console.log('Successfuly connected')
 });
+*/
 
 app.use(session({
         key: 'session',
         secret: 'helloworld123',
-        store: require('mongoose-session')(mongoose)
+        store: new MongoStore({
+          mongooseConnection: db.connection
+        })
 }));
 
 app.use(passport.initialize());
@@ -82,4 +90,3 @@ app.get('/membersarray', (req,res) => {
 })
 
 app.listen(port);
-

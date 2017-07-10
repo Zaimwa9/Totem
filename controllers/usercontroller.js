@@ -41,7 +41,7 @@ module.exports=function(app){
         if (req.isAuthenticated())
             {
                 console.log(req.session.passport.user.username);
-                return res.render('index.ejs', {auth: req.isAuthenticated(), projects: db_projects, count: db_projects.length, username: req.session.passport.user.username, userid: req.session.passport._id});
+                return res.render('index.ejs', {auth: req.isAuthenticated(), projects: db_projects, count: db_projects.length, username: req.session.passport.user.username, userid: req.session.passport.user._id});
             }
         if (!req.isAuthenticated())
             {
