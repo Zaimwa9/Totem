@@ -1,9 +1,6 @@
-//here we will process all the requests concerning the users
-//Meaning each time a request involve an action on the user it will be sent here and processed
-
 var Projects = require('../models/projects');
 var bodyParser = require('body-parser');
-var urlencodedParser = bodyParser.urlencoded({extended:false}); // this part is used being passed as a callback in the post statements
+var urlencodedParser = bodyParser.urlencoded({extended:false}); 
 var jsonParser = bodyParser.json(); // Same but parses Json objects
 var fs = require('fs');
 var multer = require('multer');
@@ -16,6 +13,7 @@ var upload = multer({
     }); 
 var type = upload.single('image');
 
+// Functions that triggers the facebook log in on specific routes to force authentication
 function ensureAuthenticated(req, res, next) {
         if (req.isAuthenticated()) { console.log('access granted'); return next(); }
         console.log('denied');
@@ -30,32 +28,12 @@ module.exports=function(app){
     }); 
     var type = upload.single('image');
 
-// First page to create a new project
+// Renders the page to create and add a new project
     app.get('/newprojectpage', ensureAuthenticated , (req, res) => {
         (req.isAuthenticated) ? res.render('newproject.ejs') : res.send('not auth')
-        /*if (req.isAuthenticated) {res.render('newproject.ejs')} else {
-        res.send('not auth')} */
     });
-     
-    app.post('/newproject', urlencodedParser, type, (req, res) => {
-        current_proj=req.body;
 
-        var target_path = __dirname + '/../public/uploads/' + req.file.originalname;
-        var db_image = '/uploads/' + req.file.originalname; 
-
-        global.Projects.adding(current_proj, req.session.passport.user, db_image, function(err, proj){
-            if (err) return res.send(err);
-            var src = fs.createReadStream(req.file.path);
-            var dest = fs.createWriteStream(target_path);
-            src.pipe(dest);
-            src.on('end', function (){
-                Users.findOneAndUpdate({username: req.session.passport.user.username}, {$push: {projects_array : current_proj.name}}, function (err, user){
-                if (err) return err
-                res.send(proj + ' saved and user modified'+ user)
-                });
-             })
-        });
-    });
+// Renders what will be the browsing page     
     app.get('/projectlist', (req,res) => {
         Projects.find({$and: [{edition : 'Totem V', active: true}]}, ['name', 'leader', 'members_count', 'created_at'], { sort: {created_at: -1}}, function (err, results, count){
             if (err) return err;
@@ -64,33 +42,60 @@ module.exports=function(app){
         });
     }); 
 
-
-
-    app.get('/projects/:projectid', ensureAuthenticated, (req, res) => {
+// Renders individual project pages
+    app.get('/projects/:projectid', (req, res) => {
         Projects.findOne({_id: req.params.projectid})
         .populate('members_array')
         .populate('curious_array')
         .exec(function (err, project){
             if (err) return err;
-            if (req.isAuthenticated)
+            if (req.isAuthenticated())
             {   
+                // This takes the curious array of a project, maps it and checks if it contains the id of the user session
                 isCurious = project.curious_array.map(object => object._id).some(id => id.toString() == req.session.passport.user._id.toString())
-                console.log(req.session.passport.user._id + ' session passport');
                 console.log(project.curious_array.map(object => object._id));
-                console.log(isCurious);
-
-                res.render('singleprojectpage', {auth: req.isAuthenticated(), isCurious: isCurious, project: project, count_members: project.members_array.length, count_curious: project.curious_array.length, moment: moment, user: req.session.passport.user});
+                return res.render('singleprojectpage', {auth: req.isAuthenticated(), isCurious: isCurious, project: project, count_members: project.members_array.length, count_curious: project.curious_array.length, moment: moment, user: req.session.passport.user});
             }
             else 
             { 
-                res.render('singleprojectpage', {auth: req.isAuthenticated(), project: project, count_members: project.members_array.length, count_curious: project.curious_array.length, moment: moment});
+		let visitor = {username: ' '};
+                return res.render('singleprojectpage', {auth: req.isAuthenticated(), isCurious: false,project: project, count_members: project.members_array.length, count_curious: project.curious_array.length, moment: moment, user: visitor});
             }
         })
     });
 
-    //Here we will handle the application to join a project that will send an email to the leader of the project
-    //Will be nice to have a thank you note popping (@Dorian)
 
+// ALL POST-REQUEST HANDLERS ARE DOWN HERE
+
+    // Handles the post request when adding a new project
+    app.post('/newproject', urlencodedParser, type, (req, res) => {
+        current_proj=req.body;
+
+        var target_path = __dirname + '/../public/uploads/' + req.file.originalname;
+        
+        // Saves in the database the path to the image
+        var db_image = '/assets/uploads/' + req.file.originalname; 
+
+        global.Projects.adding(current_proj, req.session.passport.user, db_image, function(err, proj){
+            if (err) return res.send(err);
+            // Initiate the stream pipe
+            var src = fs.createReadStream(req.file.path);
+            var dest = fs.createWriteStream(target_path);
+            src.pipe(dest);
+            // Once the upload is complete, this pushes the new project into the user project_array
+            src.on('end', function (){
+                Users.findOneAndUpdate({username: req.session.passport.user.username}, {$push: {projects_array : current_proj.name}}, function (err, user){
+                if (err) return err
+                res.send(proj + ' saved and user modified'+ user)
+                });
+             })
+        });
+    });
+
+
+    // Here we will handle the application to join a project that will send an email to the leader of the project
+    // This consists in sending an email to the leader
+    // Next step: add a waiting list on both sides that will require validation (kind of add a friend on linkedin)
     app.post('/projects/:projectid/application', (req, res) => {
         if (req.body.application.length < 10){
             return res.send('please insert a text');
@@ -111,14 +116,6 @@ module.exports=function(app){
         });
     });
 
-    app.get('/updatewadii', (req, res) => {
-        Projects.update({}, {leader_email: 'B00549848@essec.edu'}, {multi: true},
-        function(err,user){
-            if (err) return err;
-            res.send(user);
-        });
-    });
-
 // This part uses the projectname to delete the project. Actually it just sets to false the "active" field
     app.post('/projects/:projectid/delete', (req, res) => {
             //Projects.remove({name: req.params.projectname}, 
@@ -129,28 +126,30 @@ module.exports=function(app){
         });
     });
 
-// This handles the post request to become curious about the project
+    // This handles the post request to become curious about the project
     app.post('/projects/:projectid/newcurious', (req, res) => { 
         Projects.findOne({_id: req.params.projectid}, function (err, db_project){
             db_project.addCurious(req.session.passport.user, function(err, cb){
                 if (err) return (err);
                 console.log(cb + 'updated');
-                res.redirect('/projects/'+ db_project.name);
+                res.redirect('/projects/'+ db_project._id);
             }) 
         });
     });
 
+    // Same but removing a curious member
     app.post('/projects/:projectid/removecurious', (req, res) => { 
         Projects.findOne({_id: req.params.projectid}, function (err, db_project){
             db_project.removeCurious(req.session.passport.user, function(err, cb){
                 if (err) return (err);
                 console.log(cb + 'updated');
-                res.redirect('/projects/'+ db_project.name);
+                res.redirect('/projects/'+ db_project.id);
             });
         });
     });
 
 } //end of the module export
+
 
 
 /*  Projectlist version populating members_array. Will depend whether we need it in a future version

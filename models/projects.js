@@ -65,9 +65,7 @@ ProjectSchema.statics.updateproject = function (field_name, old_project_name, ne
         console.log(old_project);
         console.log(modified_project);
         console.log(user);
-/* Le mieux c'est de dire qu'il update qu'un paramètre à la fois. Ce qui signifie qu'on passe un field
-   et une nouvelle valeur. via l'id req_body ?
-*/
+
         switch(field_name){
             case 'name':
                 Projects.findOneAndUpdate({project: old_project.name}, {name: new_value}, function(err){

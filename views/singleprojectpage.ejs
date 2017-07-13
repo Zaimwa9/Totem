@@ -24,9 +24,8 @@ Sort of vitrine website and will let you signup and login etc ...
                     We think it's part of this category:
                     <%= project.category %>
                         </br>
-                        <%= 'Suis tu ce projet ?  ' + isCurious %>
+                      <h3>  <%= 'Es tu curieux de ce projet (log in pour le devenir) ?  ' + isCurious %> </h3>
                         </br>
-                        <span id = "isCurious_"> </span>
                         </br>
                         <!-- members part starts here -->
 
@@ -60,7 +59,7 @@ Sort of vitrine website and will let you signup and login etc ...
     <% if((auth) && (!isCurious)) { %>
     <form method="POST" action="/projects/<%= project._id %>/newcurious">
     <button name="curious" value="true"> Curious/interested </button> </form>
-    <%} else { %>
+    <%} else if((auth) && (isCurious)) { %>
     <form method="POST" action="/projects/<%= project._id %>/removecurious">
     <button name="curious" value="false"> Ne plus être curieux </button> </form>
     <% } %>
@@ -70,9 +69,12 @@ Sort of vitrine website and will let you signup and login etc ...
     <form method="POST" action="/projects/<%= project._id %>/delete">
     <button name="delete" value="deleteproject"> Delete the project </button> </form>
     <%} %>
+
+    <img src="<%= project.img %>" style="max-height: 400px; max-width: 600px"/>
+
 </body>
 
-    <button type = "submit" onclick="curiousClick(<%= isCurious %>)"> test moi </button>
+<!--    <button type = "submit" onclick="curiousClick(<%= isCurious %>)"> test moi </button>  -->
 <script>
     var flag = 0
     function apply_new_input() {

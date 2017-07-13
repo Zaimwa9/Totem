@@ -1,22 +1,27 @@
 var express=require('express');
 var app=express();
 var config=require('./config');
-var Users = require('./models/users')
 var mongoose=require('mongoose');
 var bodyParser=require('body-parser');
 var expressValidator=require('express-validator');
 const session = require('express-session');
 var passport = require('passport');
 
-// require controllers
-var usercontroller=require('./controllers/usercontroller.js');
-var setupcontroller=require('./controllers/setupcontroller.js');
-var projectcontroller=require('./controllers/projectcontroller.js');
-var mailgun=require('./controllers/mailfunctions.js')
-var Users= require('./models/users');
-var port=process.env.PORT || 3000;
+// Controllers
+var usercontroller = require('./controllers/usercontroller.js');
+var setupcontroller = require('./controllers/setupcontroller.js');
+var projectcontroller = require('./controllers/projectcontroller.js');
+
+// Miscellanous own modules
+var mailgun = require('./controllers/mailfunctions.js')
+var Users = require('./models/users');
 var mgconfig = require('./config/index.js')
+
+// Mongo for session storage
 const MongoStore = require('connect-mongo')(session);
+
+// Initializing port
+var port = process.env.PORT || 3000;
 
 passport.serializeUser(function(user, cb) {
   Users.findOne({facebookId: user.facebookId}, function(err, db_user){
@@ -30,15 +35,12 @@ passport.serializeUser(function(user, cb) {
 passport.deserializeUser(function(obj, cb) {
   cb(null, obj);
 });
+
+// Opening Mongo connection
 var db = mongoose.connect(mgconfig.getDbConnectionstring(), function() {
     console.log('successfully connected')
 });
 
-/*
-mongoose.connect(config.getDbConnectionstring(),function(){
-        console.log('Successfuly connected')
-});
-*/
 
 app.use(session({
         key: 'session',
@@ -52,8 +54,8 @@ app.use(passport.initialize());
 
 app.use(passport.session());
 
-app.use('/assets', express.static(__dirname+'/public')); //this exposes the public folder to serve static files
-
+app.use('/assets', express.static(__dirname+'/public')); // this exposes the public folder to serve static files
+                                                         // assets is a path, public is a folder
 app.use(bodyParser({extended: true}));
 
 app.use(expressValidator());
@@ -67,12 +69,9 @@ usercontroller(app);
 setupcontroller(app);
 projectcontroller(app);
 
-app.get('/mailtest', function(req,res){
-  mailgun.applyProject({leader: 'Wood Zm' ,email: 'B00549848@essec.edu', applicant: 'victor', project:'festin', body: 'Je pense être un bon membre pour ton projet'}) 
-  res.send('mail sent')
-});
+app.listen(port);
 
-//// Quick update function to change historic projects to active
+// Quick update function to change historic projects to active. Will be in the backoffice controller in the future
 app.get('/projectstoactive', (req,res) => {
   Projects.update({active: null}, {active: true}, {multi: true}, function(err, result){
     if (err) return err;
@@ -80,7 +79,8 @@ app.get('/projectstoactive', (req,res) => {
     res.send('done updating' + result)
   })
 });
-// to fill up the members_array
+
+// Adhoc command: fills up the members_array
 app.get('/membersarray', (req,res) => {
   Projects.update({}, {members_array: "5927f4005cba963278d8ecc2"}, {multi: true}, function(err, result){
     if (err) return err;
@@ -89,4 +89,3 @@ app.get('/membersarray', (req,res) => {
   })
 })
 
-app.listen(port);
