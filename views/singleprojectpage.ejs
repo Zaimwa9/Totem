@@ -26,7 +26,23 @@ Sort of vitrine website and will let you signup and login etc ...
                         </br>
                       <h3>  <%= 'Es tu curieux de ce projet (log in pour le devenir) ?  ' + isCurious %> </h3>
                         </br>
+                        
+                        <!-- Here is to check whether pending members work will be deleted -->
                         </br>
+                    
+                    <!-- Displays waiting list only if user is the leader -->
+
+                    <%if(project.pending_members.length > 0) {%> 
+                        <% for(i=0; i < project.pending_members.length; i++) {%>
+                            <% if(user.username == project.leader && (auth)) { %>  
+                            <h4>  'Membres en attente? '  </h4>
+                            <p> <%= project.pending_members[i].username %> </p>
+                                <form method="POST" action="/projects/<%= project._id %>/<%= project.pending_members[i]._id %>/accept"><button type="submit"> Take him on board </button> </form>
+                                <form method="POST" action="/projects/<%= project._id %>/<%= project.pending_members[i]._id %>/decline"><button type="submit"> Decline him </button> </form>                           
+                            <% } %> 
+                        <% } %>
+                    <% } %>
+                    </br> </br>
                         <!-- members part starts here -->
 
                         <%if (count_members>0) {%>
@@ -78,8 +94,8 @@ Sort of vitrine website and will let you signup and login etc ...
 <script>
     var flag = 0
     function apply_new_input() {
-        if (flag == 0) {  //meaning the text area doesn't exist yet but to be improved @Dorian
-            document.getElementById('application_area').innerHTML = '<form method="POST" action="/projects/' + '<%= project.name %>/application">' + '</br> <textarea input type="text" id="application" name=application style="width:300px; height:120px"> </textarea> </br>' +
+        if (flag == 0) {  //meaning the text area doesn't exist yet but to be improved
+            document.getElementById('application_area').innerHTML = '<form method="POST" action="/projects/' + '<%= project.id %>/application">' + '</br> <textarea input type="text" id="application" name=application style="width:300px; height:120px"> </textarea> </br>' +
                 '<button name="apply" value="member">Join the project</button> </form>';
             flag = 1
         }

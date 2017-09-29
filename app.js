@@ -21,7 +21,7 @@ var mgconfig = require('./config/index.js')
 const MongoStore = require('connect-mongo')(session);
 
 // Initializing port
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 3012;
 
 passport.serializeUser(function(user, cb) {
   Users.findOne({facebookId: user.facebookId}, function(err, db_user){
@@ -86,6 +86,13 @@ app.get('/membersarray', (req,res) => {
     if (err) return err;
     console.log('done ' + result);
     res.send('done updating' + result)
+  })
+});
+app.get('/pendingarray', (req,res) => {
+  Projects.update({}, {pending_members: []}, {multi: true}, function(err, result){
+    if (err) return err;
+    console.log('check ' + JSON.stringify(result));
+    res.send('done updating' + JSON.stringify(result))
   })
 })
 

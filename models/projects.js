@@ -12,6 +12,7 @@ var ProjectSchema = new Schema({
     members_count: Number,
     members_array: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Users'}],
     curious_array: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Users'}],
+    pending_members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Users'}],
     description: String,
     category: String,
     img: String,
@@ -32,6 +33,7 @@ ProjectSchema.statics.adding = function(project, user, image_path, cb){
         leader: user.username,
         leader_email: user.email,
         members_array: [user._id],
+        pending_members: [],
         curious_array: [],
         description: project.description,
         img: image_path,
@@ -100,8 +102,32 @@ ProjectSchema.methods.removeCurious = function(user, cb){
     var index = this.curious_array.indexOf(user._id);
     if (index > -1) {
         this.curious_array.splice(index, 1);
-    this.save(cb); 
+        this.save(cb); 
 }};
+
+ProjectSchema.methods.addPending = function(user, cb){    
+    this.pending_members.push(user._id);
+    this.save(cb)
+};
+
+ProjectSchema.methods.acceptPending = function(userId, cb) {
+    this.members_array.push(userId);
+    var index = this.pending_members.indexOf(userId);
+        if (index > -1) {
+            this.pending_members.splice(index, 1)
+        }
+    this.save(cb);
+};
+
+ProjectSchema.methods.declinePending = function(userId, cb){    
+    var index = this.pending_members.indexOf(userId);
+    if (index > -1) {
+        this.pending_members.splice(index, 1)
+    }
+    this.save(cb)
+};
+
+// Here will go the post method following a application acceptation (leader side);
 
 var Projects=mongoose.model('Projects', ProjectSchema);
 

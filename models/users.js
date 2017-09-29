@@ -62,6 +62,66 @@ UserSchema.statics.checkmail = function (user,cb) {
 }
 
 
+// Removing user from everywhere in the database A TESTER ABSOLUMENT (Pas sur à 100% que ça marche as of)
+UserSchema.statics.deleteAccount = function (user, cb) {
+    Users.findOneAndRemove(user._id, function(err){
+        console.log('removed from user database');
+    });
+    
+    Projects.find({members_array: user._id}, function (err, docs){
+        if(docs){
+            docs.forEach(function(doc){
+                var index = doc.indexOf(user._id)
+                if (index > -1) {
+                    let new_array = docs.members_array.splice(index, 1);
+                    Projects.update({_id: doc._id}, {members_array: new_array}, function(err, result){
+                        console.log('removed from member arrays')
+                    })
+                }
+            })  
+        }
+    })
+
+    Projects.find({curious_array: user._id}, function (err, docs){
+        if(docs){
+            docs.forEach(function(doc){
+                var index = doc.indexOf(user._id)
+                if (index > -1) {
+                    let new_array = docs.curious_array.splice(index, 1);
+                    Projects.update({_id: doc._id}, {curious_array: new_array}, function(err, result){
+                        console.log('removed from curious arrays')
+                    })
+                }
+            })    
+        }
+    })
+ 
+    Projects.find({pending_members: user._id}, function (err, docs){
+        if(docs){
+            docs.forEach(function(doc){
+                var index = doc.indexOf(user._id)
+                if (index > -1) {
+                    let new_array = docs.pending_members.splice(index, 1);
+                    Projects.update({_id: doc._id}, {pending_members: new_array}, function(err, result){
+                        console.log('removed from pending arrays')
+                    })
+                }
+            })  
+        }
+    })
+
+    Projects.find({leader: user.username}, function (err, docs){
+        if(docs){
+            docs.forEach(function(doc){
+                Projects.findOneAndRemove({_id: doc._id}, function(err, cb){
+                console.log('leading projects removed')   
+                })
+            })  
+        }
+    })
+
+}
+
 //encrypting the password using a middleware
 UserSchema.pre('save', function (next) {
       var User=this;
@@ -132,6 +192,7 @@ UserSchema.statics.activeprojects = function(user, cb){
         return cb(null, projects_array);
     });
 };
+
 
 
 var Users = mongoose.model('Users', UserSchema);
