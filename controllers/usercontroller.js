@@ -62,7 +62,7 @@ module.exports = function (app) {
     var error = req.validationErrors()
     if (error) {
       console.log(error)
-      res.send(error); return
+      res.send(error)
     } else {
       global.Users.register(req.body, function (err, user) {
         if (err) return res.send('error + Mongoose')
